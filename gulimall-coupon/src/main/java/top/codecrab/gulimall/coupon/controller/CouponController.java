@@ -33,7 +33,6 @@ public class CouponController {
         return R.ok().put("page", page);
     }
 
-
     /**
      * 信息
      */
