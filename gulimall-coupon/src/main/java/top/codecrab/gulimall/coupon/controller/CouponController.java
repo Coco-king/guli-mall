@@ -8,6 +8,7 @@ import top.codecrab.gulimall.coupon.service.CouponService;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -22,6 +23,17 @@ public class CouponController {
 
     @Resource
     private CouponService couponService;
+
+    /**
+     * 查询优惠列表
+     */
+    @GetMapping("/member/list")
+    public R memberCoupons() {
+        CouponEntity couponEntity = new CouponEntity();
+        couponEntity.setCouponName("满5000减400");
+
+        return R.ok().put("coupons", Collections.singletonList(couponEntity));
+    }
 
     /**
      * 列表

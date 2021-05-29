@@ -53,4 +53,9 @@ public class R extends HashMap<String, Object> {
         super.put(key, value);
         return this;
     }
+
+    public R data(String key, Object value) {
+        this.put(key, value);
+        return this;
+    }
 }
