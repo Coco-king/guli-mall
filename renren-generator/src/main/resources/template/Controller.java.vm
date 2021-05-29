@@ -33,7 +33,6 @@ public class ${className}Controller {
         return R.ok().put("page", page);
     }
 
-
     /**
      * 信息
      */
