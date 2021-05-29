@@ -1,0 +1,20 @@
+server:
+  port: 88
+spring:
+  application:
+    name: gulimall-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: 5a8d8050-67b6-4b53-a6b2-db532fbab521
+    gateway:
+      routes:
+        - id: baidu_route
+          uri: https://www.baidu.com
+          predicates:
+            - Query=url, baidu
+        - id: qq_route
+          uri: https://www.qq.com
+          predicates:
+            - Query=url, qq

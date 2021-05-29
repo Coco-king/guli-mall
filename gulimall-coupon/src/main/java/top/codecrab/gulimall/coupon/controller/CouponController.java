@@ -1,5 +1,7 @@
 package top.codecrab.gulimall.coupon.controller;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 import top.codecrab.common.utils.PageUtils;
 import top.codecrab.common.utils.R;
@@ -17,12 +19,27 @@ import java.util.Map;
  * @author codecrab
  * @date 2021-05-28 22:26:50
  */
+@RefreshScope
 @RestController
 @RequestMapping("coupon/coupon")
 public class CouponController {
 
     @Resource
     private CouponService couponService;
+
+    @Value("${coupon.user.name}")
+    private String name;
+
+    @Value("${coupon.user.age}")
+    private Integer age;
+
+    /**
+     * 查询优惠列表
+     */
+    @GetMapping("/test")
+    public R test() {
+        return R.ok().data("name", name).data("age", age);
+    }
 
     /**
      * 查询优惠列表
