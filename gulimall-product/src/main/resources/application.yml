@@ -12,6 +12,7 @@ spring:
     nacos:
       discovery:
         server-addr: localhost:8848
+        namespace: 4d48d086-fed0-4c37-8244-89caaf29e97e
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
   global-config:
