@@ -1,6 +1,7 @@
 package top.codecrab.common.utils;
 
 import org.apache.http.HttpStatus;
+import top.codecrab.common.response.ResponseEnum;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +48,10 @@ public class R extends HashMap<String, Object> {
 
     public static R ok() {
         return new R();
+    }
+
+    public static R setResult(ResponseEnum responseEnum) {
+        return error(responseEnum.getCode(), responseEnum.getMsg());
     }
 
     public R put(String key, Object value) {

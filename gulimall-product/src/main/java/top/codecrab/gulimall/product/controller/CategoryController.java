@@ -1,14 +1,15 @@
 package top.codecrab.gulimall.product.controller;
 
 import org.springframework.web.bind.annotation.*;
-import top.codecrab.common.utils.PageUtils;
+import top.codecrab.common.response.ResponseEnum;
+import top.codecrab.common.utils.Assert;
 import top.codecrab.common.utils.R;
 import top.codecrab.gulimall.product.entity.CategoryEntity;
 import top.codecrab.gulimall.product.service.CategoryService;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.List;
 
 /**
  * 商品三级分类
@@ -24,15 +25,14 @@ public class CategoryController {
     private CategoryService categoryService;
 
     /**
-     * 列表
+     * 查询所有分类的树形列表
      */
-    @GetMapping("/list")
-    public R list(@RequestParam Map<String, Object> params) {
-        PageUtils page = categoryService.queryPage(params);
+    @GetMapping("/list/tree")
+    public R list() {
+        List<CategoryEntity> entities = categoryService.listWithTree();
 
-        return R.ok().put("page", page);
+        return R.ok().put("data", entities);
     }
-
 
     /**
      * 信息
@@ -49,6 +49,8 @@ public class CategoryController {
      */
     @PostMapping("/save")
     public R save(@RequestBody CategoryEntity category) {
+        Assert.notBlank(category.getName(), ResponseEnum.CATEGORY_NAME_NULL_ERROR);
+
         categoryService.save(category);
 
         return R.ok();
@@ -69,7 +71,7 @@ public class CategoryController {
      */
     @DeleteMapping("/delete")
     public R delete(@RequestBody Long[] catIds) {
-        categoryService.removeByIds(Arrays.asList(catIds));
+        categoryService.removeMenuByIds(Arrays.asList(catIds));
 
         return R.ok();
     }

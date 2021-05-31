@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: gulimall-product
+  cloud:
+    nacos:
+      config:
+        server-addr: localhost:8848
+        group: dev
+        namespace: 0e432075-a68b-4bc9-a1f6-01fffccbe101
+        file-extension: yaml

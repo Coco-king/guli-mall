@@ -7,14 +7,25 @@ spring:
     nacos:
       discovery:
         server-addr: localhost:8848
-        namespace: 5a8d8050-67b6-4b53-a6b2-db532fbab521
+        group: dev
+        namespace: 999f941b-0bbf-4574-b1f9-e24ff6e341ab
     gateway:
       routes:
         - id: baidu_route
           uri: https://www.baidu.com
           predicates:
             - Query=url, baidu
-        - id: qq_route
-          uri: https://www.qq.com
+
+        - id: product_route
+          uri: lb://gulimall-product
           predicates:
-            - Query=url, qq
+            - Path=/api/product/**
+          filters:
+            - RewritePath=/api(?<segment>/?.*), /$\{segment}
+
+        - id: admin_route
+          uri: lb://renren-fast
+          predicates:
+            - Path=/api/**
+          filters:
+            - RewritePath=/api(?<segment>/?.*), /renren-fast/$\{segment}
