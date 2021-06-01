@@ -2,7 +2,7 @@ package top.codecrab.gulimall.member.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-import top.codecrab.common.utils.R;
+import top.codecrab.common.response.R;
 
 /**
  * @author codecrab

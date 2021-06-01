@@ -3,7 +3,7 @@ package top.codecrab.gulimall.product.controller;
 import org.springframework.web.bind.annotation.*;
 import top.codecrab.common.response.ResponseEnum;
 import top.codecrab.common.utils.Assert;
-import top.codecrab.common.utils.R;
+import top.codecrab.common.response.R;
 import top.codecrab.gulimall.product.entity.CategoryEntity;
 import top.codecrab.gulimall.product.service.CategoryService;
 

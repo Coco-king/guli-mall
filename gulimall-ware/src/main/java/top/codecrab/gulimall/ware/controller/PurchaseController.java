@@ -2,7 +2,7 @@ package top.codecrab.gulimall.ware.controller;
 
 import org.springframework.web.bind.annotation.*;
 import top.codecrab.common.utils.PageUtils;
-import top.codecrab.common.utils.R;
+import top.codecrab.common.response.R;
 import top.codecrab.gulimall.ware.entity.PurchaseEntity;
 import top.codecrab.gulimall.ware.service.PurchaseService;
 

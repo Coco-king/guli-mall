@@ -2,7 +2,7 @@ package top.codecrab.gulimall.member.controller;
 
 import org.springframework.web.bind.annotation.*;
 import top.codecrab.common.utils.PageUtils;
-import top.codecrab.common.utils.R;
+import top.codecrab.common.response.R;
 import top.codecrab.gulimall.member.client.CouponClient;
 import top.codecrab.gulimall.member.entity.MemberEntity;
 import top.codecrab.gulimall.member.service.MemberService;

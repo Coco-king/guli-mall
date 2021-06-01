@@ -1,7 +1,6 @@
-package top.codecrab.common.utils;
+package top.codecrab.common.response;
 
 import org.apache.http.HttpStatus;
-import top.codecrab.common.response.ResponseEnum;
 
 import java.util.HashMap;
 import java.util.Map;

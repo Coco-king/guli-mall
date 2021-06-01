@@ -20,7 +20,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.NoHandlerFoundException;
 import top.codecrab.common.exception.RRException;
 import top.codecrab.common.response.ResponseEnum;
-import top.codecrab.common.utils.R;
+import top.codecrab.common.response.R;
 
 /**
  * @author codecrab

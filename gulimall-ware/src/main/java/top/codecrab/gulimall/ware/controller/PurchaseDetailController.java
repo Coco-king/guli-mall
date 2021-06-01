@@ -2,7 +2,7 @@ package top.codecrab.gulimall.ware.controller;
 
 import org.springframework.web.bind.annotation.*;
 import top.codecrab.common.utils.PageUtils;
-import top.codecrab.common.utils.R;
+import top.codecrab.common.response.R;
 import top.codecrab.gulimall.ware.entity.PurchaseDetailEntity;
 import top.codecrab.gulimall.ware.service.PurchaseDetailService;
 
@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 /**
- * 
+ *
  *
  * @author codecrab
  * @date 2021-05-28 22:50:44

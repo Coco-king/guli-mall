@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 import top.codecrab.common.utils.PageUtils;
-import top.codecrab.common.utils.R;
+import top.codecrab.common.response.R;
 import top.codecrab.gulimall.coupon.entity.CouponEntity;
 import top.codecrab.gulimall.coupon.service.CouponService;
 
