@@ -43,6 +43,7 @@ public enum ResponseEnum {
     LOGIN_LOCKED_ERROR(-210, false, "用户被锁定"),
     LOGIN_AUTH_ERROR(-211, false, "未登录"),
     CATEGORY_NAME_NULL_ERROR(-212, false, "商品分类名称不能为空"),
+    REMOVE_FILE_URL_NULL_ERROR(-213, false, "删除的图片路径不能为空"),
 
     USER_BIND_ID_CARD_EXIST_ERROR(-301, false, "身份证号码已绑定"),
     USER_NO_BIND_ERROR(-302, false, "用户未绑定"),

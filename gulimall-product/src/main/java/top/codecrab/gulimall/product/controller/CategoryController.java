@@ -1,9 +1,9 @@
 package top.codecrab.gulimall.product.controller;
 
 import org.springframework.web.bind.annotation.*;
+import top.codecrab.common.response.R;
 import top.codecrab.common.response.ResponseEnum;
 import top.codecrab.common.utils.Assert;
-import top.codecrab.common.response.R;
 import top.codecrab.gulimall.product.entity.CategoryEntity;
 import top.codecrab.gulimall.product.service.CategoryService;
 
@@ -41,7 +41,7 @@ public class CategoryController {
     public R info(@PathVariable("catId") Long catId) {
         CategoryEntity category = categoryService.getById(catId);
 
-        return R.ok().put("category", category);
+        return R.ok().put("data", category);
     }
 
     /**
@@ -61,7 +61,19 @@ public class CategoryController {
      */
     @PutMapping("/update")
     public R update(@RequestBody CategoryEntity category) {
+        Assert.notBlank(category.getName(), ResponseEnum.CATEGORY_NAME_NULL_ERROR);
+
         categoryService.updateById(category);
+
+        return R.ok();
+    }
+
+    /**
+     * 批量修改排序
+     */
+    @PutMapping("/update/sort")
+    public R update(@RequestBody List<CategoryEntity> categories) {
+        categoryService.updateBatchById(categories);
 
         return R.ok();
     }
