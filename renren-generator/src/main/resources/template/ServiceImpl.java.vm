@@ -16,7 +16,7 @@ import java.util.Map;
  * ${comments}
  *
  * @author ${author}
- * @date ${datetime}
+ * @since ${datetime}
  */
 @Service("${classname}Service")
 public class ${className}ServiceImpl extends ServiceImpl<${className}Dao, ${className}Entity> implements ${className}Service {

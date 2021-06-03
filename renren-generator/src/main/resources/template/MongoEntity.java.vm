@@ -17,7 +17,7 @@ import org.springframework.data.annotation.Id;
  * ${comments}
  *
  * @author ${author}
- * @date ${datetime}
+ * @since ${datetime}
  */
 @Data
 @Document(collection = "${tableName}")
