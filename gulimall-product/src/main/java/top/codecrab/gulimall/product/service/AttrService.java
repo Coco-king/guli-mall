@@ -3,7 +3,11 @@ package top.codecrab.gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.codecrab.common.utils.PageUtils;
 import top.codecrab.gulimall.product.entity.AttrEntity;
+import top.codecrab.gulimall.product.vo.AttrRelationVo;
+import top.codecrab.gulimall.product.vo.AttrResponseVo;
+import top.codecrab.gulimall.product.vo.AttrVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,5 +19,17 @@ import java.util.Map;
 public interface AttrService extends IService<AttrEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void saveAttr(AttrVo attr);
+
+    PageUtils queryBaseList(Map<String, Object> params, Long catelogId, String attrType);
+
+    void updateAttr(AttrVo attr);
+
+    AttrResponseVo getAttrResponseVo(Long attrId);
+
+    List<AttrEntity> findAttrRelation(Long attrGroupId);
+
+    void removeRelations(List<AttrRelationVo> relationVos);
 }
 

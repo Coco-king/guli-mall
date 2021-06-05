@@ -1,10 +1,11 @@
 package top.codecrab.gulimall.product.controller;
 
 import org.springframework.web.bind.annotation.*;
-import top.codecrab.common.utils.PageUtils;
 import top.codecrab.common.response.R;
-import top.codecrab.gulimall.product.entity.AttrEntity;
+import top.codecrab.common.utils.PageUtils;
 import top.codecrab.gulimall.product.service.AttrService;
+import top.codecrab.gulimall.product.vo.AttrResponseVo;
+import top.codecrab.gulimall.product.vo.AttrVo;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -23,6 +24,17 @@ public class AttrController {
     @Resource
     private AttrService attrService;
 
+    @GetMapping("/{attrType}/list/{catelogId}")
+    private R baseList(
+            @RequestParam Map<String, Object> params,
+            @PathVariable Long catelogId,
+            @PathVariable String attrType
+    ) {
+        PageUtils page = attrService.queryBaseList(params, catelogId, attrType);
+
+        return R.ok().put("page", page);
+    }
+
     /**
      * 列表
      */
@@ -39,7 +51,7 @@ public class AttrController {
      */
     @GetMapping("/info/{attrId}")
     public R info(@PathVariable("attrId") Long attrId) {
-        AttrEntity attr = attrService.getById(attrId);
+        AttrResponseVo attr = attrService.getAttrResponseVo(attrId);
 
         return R.ok().put("attr", attr);
     }
@@ -48,8 +60,8 @@ public class AttrController {
      * 保存
      */
     @PostMapping("/save")
-    public R save(@RequestBody AttrEntity attr) {
-        attrService.save(attr);
+    public R save(@RequestBody AttrVo attr) {
+        attrService.saveAttr(attr);
 
         return R.ok();
     }
@@ -58,8 +70,8 @@ public class AttrController {
      * 修改
      */
     @PutMapping("/update")
-    public R update(@RequestBody AttrEntity attr) {
-        attrService.updateById(attr);
+    public R update(@RequestBody AttrVo attr) {
+        attrService.updateAttr(attr);
 
         return R.ok();
     }

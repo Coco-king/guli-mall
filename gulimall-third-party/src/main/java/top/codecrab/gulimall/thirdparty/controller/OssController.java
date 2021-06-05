@@ -1,13 +1,15 @@
 package top.codecrab.gulimall.thirdparty.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.web.bind.annotation.*;
 import top.codecrab.common.response.R;
-import top.codecrab.common.response.ResponseEnum;
+import top.codecrab.common.response.ErrorCodeEnum;
 import top.codecrab.common.utils.Assert;
 import top.codecrab.gulimall.thirdparty.service.OssService;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,11 +32,11 @@ public class OssController {
     }
 
     @DeleteMapping("/oss/remove")
-    public R remove(@RequestBody Map<String, String> params) {
-        String url = params.get("url");
-        Assert.notBlank(url, ResponseEnum.REMOVE_FILE_URL_NULL_ERROR);
+    public R remove(@RequestBody Map<String, List<String>> params) {
+        List<String> urls = params.get("urls");
+        Assert.isFalse(CollectionUtil.isEmpty(urls), ErrorCodeEnum.REMOVE_FILE_URL_NULL_ERROR);
 
-        ossService.removeFile(url);
+        ossService.removeFile(urls);
         return R.ok();
     }
 

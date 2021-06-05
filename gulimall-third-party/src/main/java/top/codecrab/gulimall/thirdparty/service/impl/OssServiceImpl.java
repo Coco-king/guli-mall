@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,7 +63,7 @@ public class OssServiceImpl implements OssService {
     }
 
     @Override
-    public void removeFile(String url) {
+    public void removeFile(List<String> urls) {
         // 创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(
                 OssProperties.ENDPOINT,
@@ -73,10 +74,14 @@ public class OssServiceImpl implements OssService {
         try {
             // 需要截断的：https://srb-service-file.oss-cn-beijing.aliyuncs.com/
             String host = StrUtil.format("https://{}.{}/", OssProperties.BUCKET_NAME, OssProperties.ENDPOINT);
-            // 需要的：avatar/2021/04/26/8b40dde3d8ea4a2e8303fa3b279b8daa.jpg
-            String objectName = url.substring(host.length());
+            urls.forEach(url -> {
+                if (StrUtil.isNotBlank(url)) {
+                    // 需要的：avatar/2021/04/26/8b40dde3d8ea4a2e8303fa3b279b8daa.jpg
+                    String objectName = url.substring(host.length());
 
-            ossClient.deleteObject(OssProperties.BUCKET_NAME, objectName);
+                    ossClient.deleteObject(OssProperties.BUCKET_NAME, objectName);
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -96,7 +101,7 @@ public class OssServiceImpl implements OssService {
         String host = "https://" + OssProperties.BUCKET_NAME + "." + OssProperties.ENDPOINT;
         // callbackUrl为 上传回调服务器的URL，请将下面的IP和Port配置为您自己的真实信息。
         //String callbackUrl = "http://88.88.88.88:8888";
-        String dir = type + new SimpleDateFormat("/yyyy/MM/dd/").format(new Date());
+        String dir = type + new SimpleDateFormat("/yyyy/MM/").format(new Date());
 
         Map<String, String> respMap = null;
         try {

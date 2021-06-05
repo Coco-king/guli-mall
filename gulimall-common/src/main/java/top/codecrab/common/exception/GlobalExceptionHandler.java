@@ -1,11 +1,11 @@
-package top.codecrab.gulimall.product.exception;
+package top.codecrab.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
-import org.springframework.jdbc.BadSqlGrammarException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -18,8 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import top.codecrab.common.exception.RRException;
-import top.codecrab.common.response.ResponseEnum;
+import top.codecrab.common.response.ErrorCodeEnum;
 import top.codecrab.common.response.R;
 
 /**
@@ -28,24 +27,24 @@ import top.codecrab.common.response.R;
  */
 @Slf4j
 @RestControllerAdvice
-public class UnifiedExceptionHandler {
-
-    @ExceptionHandler(Exception.class)
-    public R handleException(Exception e) {
-        log.error(e.getMessage(), e);
-        return R.error();
-    }
-
-    @ExceptionHandler(BadSqlGrammarException.class)
-    public R handleException(BadSqlGrammarException e) {
-        log.error(e.getMessage(), e);
-        return R.setResult(ResponseEnum.BAD_SQL_GRAMMAR_ERROR);
-    }
+public class GlobalExceptionHandler {
 
     @ExceptionHandler(RRException.class)
     public R handleException(RRException e) {
-        log.error(e.getMsg(), e);
+        log.error("RRException异常：{}", e.getMsg());
         return R.error(e.getCode(), e.getMsg());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public R handleException(MethodArgumentNotValidException e) {
+        FieldError error = e.getBindingResult().getFieldError();
+        if (error != null) {
+            String errors = error.getDefaultMessage();
+            log.error("MethodArgumentNotValidException异常：{}", errors);
+            return R.error(ErrorCodeEnum.VALID_EXCEPTION.getCode(), errors);
+        }
+        log.error("MethodArgumentNotValidException异常：{}", e.getMessage());
+        return R.error();
     }
 
     /**
@@ -60,7 +59,6 @@ public class UnifiedExceptionHandler {
             TypeMismatchException.class,
             HttpMessageNotReadableException.class,
             HttpMessageNotWritableException.class,
-            MethodArgumentNotValidException.class,
             HttpMediaTypeNotAcceptableException.class,
             ServletRequestBindingException.class,
             ConversionNotSupportedException.class,
@@ -69,7 +67,12 @@ public class UnifiedExceptionHandler {
     })
     public R handleServletException(Exception e) {
         log.error(e.getMessage(), e);
-        //SERVLET_ERROR(-102, "servlet请求异常"),
-        return R.setResult(ResponseEnum.SERVLET_ERROR);
+        return R.setResult(ErrorCodeEnum.SERVLET_ERROR);
+    }
+
+    @ExceptionHandler(Throwable.class)
+    public R handleException(Throwable t) {
+        log.error(t.getMessage(), t);
+        return R.error(ErrorCodeEnum.UNKNOWN_EXCEPTION);
     }
 }

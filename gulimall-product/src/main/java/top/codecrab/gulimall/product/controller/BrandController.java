@@ -1,14 +1,25 @@
 package top.codecrab.gulimall.product.controller;
 
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import top.codecrab.common.utils.PageUtils;
+import top.codecrab.common.response.ErrorCodeEnum;
 import top.codecrab.common.response.R;
+import top.codecrab.common.utils.Assert;
+import top.codecrab.common.utils.PageUtils;
+import top.codecrab.common.valid.AddGroup;
+import top.codecrab.common.valid.UpdateGroup;
+import top.codecrab.common.valid.UpdateStatusGroup;
+import top.codecrab.gulimall.product.client.ThirdPartyClient;
 import top.codecrab.gulimall.product.entity.BrandEntity;
 import top.codecrab.gulimall.product.service.BrandService;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 品牌
@@ -22,6 +33,9 @@ public class BrandController {
 
     @Resource
     private BrandService brandService;
+
+    @Resource
+    private ThirdPartyClient thirdPartyClient;
 
     /**
      * 列表
@@ -48,7 +62,13 @@ public class BrandController {
      * 保存
      */
     @PostMapping("/save")
-    public R save(@RequestBody BrandEntity brand) {
+    public R save(@Validated(AddGroup.class) @RequestBody BrandEntity brand) {
+        if (StrUtil.isBlank(brand.getDescript())) {
+            brand.setDescript(brand.getName() + "品牌");
+        }
+        if (StrUtil.isNotBlank(brand.getFirstLetter())) {
+            brand.setFirstLetter(brand.getFirstLetter().toUpperCase());
+        }
         brandService.save(brand);
 
         return R.ok();
@@ -58,7 +78,21 @@ public class BrandController {
      * 修改
      */
     @PutMapping("/update")
-    public R update(@RequestBody BrandEntity brand) {
+    public R update(@Validated(UpdateGroup.class) @RequestBody BrandEntity brand) {
+        Assert.isNotAllEmpty(ErrorCodeEnum.VALID_NOT_ALL_NULL_EXCEPTION, brand.getName(), brand.getLogo(), brand.getFirstLetter(), brand.getShowStatus(), brand.getSort(), brand.getDescript());
+        if (StrUtil.isNotBlank(brand.getFirstLetter())) {
+            brand.setFirstLetter(brand.getFirstLetter().toUpperCase());
+        }
+        brandService.updateDetail(brand);
+
+        return R.ok();
+    }
+
+    /**
+     * 修改状态
+     */
+    @PutMapping("/update/status")
+    public R updateStatus(@Validated(UpdateStatusGroup.class) @RequestBody BrandEntity brand) {
         brandService.updateById(brand);
 
         return R.ok();
@@ -69,7 +103,13 @@ public class BrandController {
      */
     @DeleteMapping("/delete")
     public R delete(@RequestBody Long[] brandIds) {
-        brandService.removeByIds(Arrays.asList(brandIds));
+        List<Long> idList = Arrays.asList(brandIds);
+        List<String> urls = brandService.listByIds(idList).stream()
+                .map(BrandEntity::getLogo)
+                .collect(Collectors.toList());
+        thirdPartyClient.remove(MapUtil.of("urls", urls));
+
+        brandService.removeByIds(idList);
 
         return R.ok();
     }

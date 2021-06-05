@@ -2,7 +2,7 @@ package top.codecrab.gulimall.product.controller;
 
 import org.springframework.web.bind.annotation.*;
 import top.codecrab.common.response.R;
-import top.codecrab.common.response.ResponseEnum;
+import top.codecrab.common.response.ErrorCodeEnum;
 import top.codecrab.common.utils.Assert;
 import top.codecrab.gulimall.product.entity.CategoryEntity;
 import top.codecrab.gulimall.product.service.CategoryService;
@@ -49,7 +49,7 @@ public class CategoryController {
      */
     @PostMapping("/save")
     public R save(@RequestBody CategoryEntity category) {
-        Assert.notBlank(category.getName(), ResponseEnum.CATEGORY_NAME_NULL_ERROR);
+        Assert.notBlank(category.getName(), ErrorCodeEnum.CATEGORY_NAME_NULL_ERROR);
 
         categoryService.save(category);
 
@@ -61,9 +61,9 @@ public class CategoryController {
      */
     @PutMapping("/update")
     public R update(@RequestBody CategoryEntity category) {
-        Assert.notBlank(category.getName(), ResponseEnum.CATEGORY_NAME_NULL_ERROR);
+        Assert.notBlank(category.getName(), ErrorCodeEnum.CATEGORY_NAME_NULL_ERROR);
 
-        categoryService.updateById(category);
+        categoryService.updateDetail(category);
 
         return R.ok();
     }

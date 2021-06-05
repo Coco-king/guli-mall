@@ -8,7 +8,7 @@
 
 package top.codecrab.common.exception;
 
-import top.codecrab.common.response.ResponseEnum;
+import top.codecrab.common.response.ErrorCodeEnum;
 
 /**
  * 自定义异常
@@ -43,8 +43,8 @@ public class RRException extends RuntimeException {
         this.code = code;
     }
 
-    public RRException(ResponseEnum responseEnum) {
-        this(responseEnum.getMsg(), responseEnum.getCode());
+    public RRException(ErrorCodeEnum errorCodeEnum) {
+        this(errorCodeEnum.getMsg(), errorCodeEnum.getCode());
     }
 
     public String getMsg() {

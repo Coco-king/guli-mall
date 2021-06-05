@@ -1,27 +1,17 @@
-package top.codecrab.gulimall.product.entity;
+package top.codecrab.gulimall.product.vo;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.io.Serializable;
-
 /**
- * 商品属性
- *
  * @author codecrab
- * @date 2021-05-28 22:19:47
+ * @since 2021年06月05日 13:41
  */
 @Data
-@TableName("pms_attr")
-public class AttrEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class AttrVo {
 
     /**
      * 属性id
      */
-    @TableId
     private Long attrId;
 
     /**
@@ -50,7 +40,7 @@ public class AttrEntity implements Serializable {
     private String valueSelect;
 
     /**
-     * 属性类型[0-销售属性，1-基本属性]
+     * 属性类型[0-销售属性，1-基本属性，2-既是销售属性又是基本属性]
      */
     private Integer attrType;
 
@@ -69,4 +59,5 @@ public class AttrEntity implements Serializable {
      */
     private Integer showDesc;
 
+    private Long attrGroupId;
 }

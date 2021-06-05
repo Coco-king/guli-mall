@@ -6,10 +6,15 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import top.codecrab.common.utils.PageUtils;
 import top.codecrab.common.utils.Query;
+import top.codecrab.gulimall.product.dao.BrandDao;
 import top.codecrab.gulimall.product.dao.CategoryBrandRelationDao;
+import top.codecrab.gulimall.product.dao.CategoryDao;
+import top.codecrab.gulimall.product.entity.BrandEntity;
 import top.codecrab.gulimall.product.entity.CategoryBrandRelationEntity;
+import top.codecrab.gulimall.product.entity.CategoryEntity;
 import top.codecrab.gulimall.product.service.CategoryBrandRelationService;
 
+import javax.annotation.Resource;
 import java.util.Map;
 
 /**
@@ -21,6 +26,12 @@ import java.util.Map;
 @Service("categoryBrandRelationService")
 public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandRelationDao, CategoryBrandRelationEntity> implements CategoryBrandRelationService {
 
+    @Resource
+    private BrandDao brandDao;
+
+    @Resource
+    private CategoryDao categoryDao;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<CategoryBrandRelationEntity> page = this.page(
@@ -29,6 +40,18 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void saveDetail(CategoryBrandRelationEntity categoryBrandRelation) {
+        Long brandId = categoryBrandRelation.getBrandId();
+        Long catelogId = categoryBrandRelation.getCatelogId();
+
+        BrandEntity brandEntity = brandDao.selectById(brandId);
+        CategoryEntity categoryEntity = categoryDao.selectById(catelogId);
+        categoryBrandRelation.setBrandName(brandEntity.getName());
+        categoryBrandRelation.setCatelogName(categoryEntity.getName());
+        baseMapper.insert(categoryBrandRelation);
     }
 
 }

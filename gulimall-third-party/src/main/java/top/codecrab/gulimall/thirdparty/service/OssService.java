@@ -1,6 +1,7 @@
 package top.codecrab.gulimall.thirdparty.service;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,9 +23,9 @@ public interface OssService {
     /**
      * 删除阿里云OSS文件
      *
-     * @param url 要删除的文件路径
+     * @param urls 要删除的文件路径集合
      */
-    void removeFile(String url);
+    void removeFile(List<String> urls);
 
     Map<String, String> createPolicy(String type);
 }

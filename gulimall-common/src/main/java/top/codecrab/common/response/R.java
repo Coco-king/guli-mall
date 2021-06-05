@@ -33,6 +33,10 @@ public class R extends HashMap<String, Object> {
         return r;
     }
 
+    public static R error(ErrorCodeEnum codeEnum) {
+        return error(codeEnum.getCode(), codeEnum.getMsg());
+    }
+
     public static R ok(String msg) {
         R r = new R();
         r.put("msg", msg);
@@ -49,8 +53,8 @@ public class R extends HashMap<String, Object> {
         return new R();
     }
 
-    public static R setResult(ResponseEnum responseEnum) {
-        return error(responseEnum.getCode(), responseEnum.getMsg());
+    public static R setResult(ErrorCodeEnum errorCodeEnum) {
+        return error(errorCodeEnum.getCode(), errorCodeEnum.getMsg());
     }
 
     public R put(String key, Object value) {
