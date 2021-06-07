@@ -11,7 +11,7 @@ import top.codecrab.common.utils.PageUtils;
 import top.codecrab.common.valid.AddGroup;
 import top.codecrab.common.valid.UpdateGroup;
 import top.codecrab.common.valid.UpdateStatusGroup;
-import top.codecrab.gulimall.product.client.ThirdPartyClient;
+import top.codecrab.gulimall.product.client.ThirdPartyFeignClient;
 import top.codecrab.gulimall.product.entity.BrandEntity;
 import top.codecrab.gulimall.product.service.BrandService;
 
@@ -35,7 +35,7 @@ public class BrandController {
     private BrandService brandService;
 
     @Resource
-    private ThirdPartyClient thirdPartyClient;
+    private ThirdPartyFeignClient thirdPartyFeignClient;
 
     /**
      * 列表
@@ -104,10 +104,11 @@ public class BrandController {
     @DeleteMapping("/delete")
     public R delete(@RequestBody Long[] brandIds) {
         List<Long> idList = Arrays.asList(brandIds);
+
         List<String> urls = brandService.listByIds(idList).stream()
                 .map(BrandEntity::getLogo)
                 .collect(Collectors.toList());
-        thirdPartyClient.remove(MapUtil.of("urls", urls));
+        thirdPartyFeignClient.remove(MapUtil.of("urls", urls));
 
         brandService.removeByIds(idList);
 

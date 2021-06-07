@@ -1,8 +1,9 @@
 package top.codecrab.gulimall.coupon.controller;
 
 import org.springframework.web.bind.annotation.*;
-import top.codecrab.common.utils.PageUtils;
 import top.codecrab.common.response.R;
+import top.codecrab.common.to.SkuReductionTo;
+import top.codecrab.common.utils.PageUtils;
 import top.codecrab.gulimall.coupon.entity.SkuFullReductionEntity;
 import top.codecrab.gulimall.coupon.service.SkuFullReductionService;
 
@@ -50,6 +51,16 @@ public class SkuFullReductionController {
     @PostMapping("/save")
     public R save(@RequestBody SkuFullReductionEntity skuFullReduction) {
         skuFullReductionService.save(skuFullReduction);
+
+        return R.ok();
+    }
+
+    /**
+     * 保存
+     */
+    @PostMapping("/save/info")
+    public R saveInfo(@RequestBody SkuReductionTo skuReductionTo) {
+        skuFullReductionService.saveInfo(skuReductionTo);
 
         return R.ok();
     }

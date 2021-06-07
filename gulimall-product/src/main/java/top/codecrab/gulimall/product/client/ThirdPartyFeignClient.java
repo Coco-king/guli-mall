@@ -13,7 +13,7 @@ import java.util.Map;
  * @since 2021年06月03日 17:23
  */
 @FeignClient("gulimall-third-party")
-public interface ThirdPartyClient {
+public interface ThirdPartyFeignClient {
     @DeleteMapping("/oss/remove")
     R remove(@RequestBody Map<String, List<String>> params);
 }

@@ -5,6 +5,7 @@ import top.codecrab.common.utils.PageUtils;
 import top.codecrab.common.response.R;
 import top.codecrab.gulimall.product.entity.SpuInfoEntity;
 import top.codecrab.gulimall.product.service.SpuInfoService;
+import top.codecrab.gulimall.product.vo.spu.SpuSaveVo;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -48,8 +49,8 @@ public class SpuInfoController {
      * 保存
      */
     @PostMapping("/save")
-    public R save(@RequestBody SpuInfoEntity spuInfo) {
-        spuInfoService.save(spuInfo);
+    public R save(@RequestBody SpuSaveVo saveVo) {
+        spuInfoService.saveSpuInfo(saveVo);
 
         return R.ok();
     }

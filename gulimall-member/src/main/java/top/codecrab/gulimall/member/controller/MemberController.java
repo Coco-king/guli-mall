@@ -3,7 +3,7 @@ package top.codecrab.gulimall.member.controller;
 import org.springframework.web.bind.annotation.*;
 import top.codecrab.common.utils.PageUtils;
 import top.codecrab.common.response.R;
-import top.codecrab.gulimall.member.client.CouponClient;
+import top.codecrab.gulimall.member.client.CouponFeignClient;
 import top.codecrab.gulimall.member.entity.MemberEntity;
 import top.codecrab.gulimall.member.service.MemberService;
 
@@ -25,14 +25,14 @@ public class MemberController {
     private MemberService memberService;
 
     @Resource
-    private CouponClient couponClient;
+    private CouponFeignClient couponFeignClient;
 
     @GetMapping("/coupons")
     public R coupons() {
         MemberEntity memberEntity = new MemberEntity();
         memberEntity.setNickname("张三");
 
-        R coupons = couponClient.memberCoupons();
+        R coupons = couponFeignClient.memberCoupons();
         return R.ok().data("member", memberEntity).data("coupons", coupons.get("coupons"));
     }
 

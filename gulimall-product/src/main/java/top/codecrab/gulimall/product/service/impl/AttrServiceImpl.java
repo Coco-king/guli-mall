@@ -3,6 +3,7 @@ package top.codecrab.gulimall.product.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -66,7 +67,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         baseMapper.insert(attrEntity);
 
         //如果是基本属性,保存关联信息
-        if (attrEntity.getAttrType() == ProductConstant.AttrEnum.ATTR_BASE.getCode()) {
+        if (attrEntity.getAttrType() == ProductConstant.AttrEnum.ATTR_BASE.getCode() && attr.getAttrGroupId() != null) {
             AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
             relationEntity.setAttrId(attrEntity.getAttrId());
             relationEntity.setAttrGroupId(attr.getAttrGroupId());
@@ -76,19 +77,24 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
     @Override
     public PageUtils queryBaseList(Map<String, Object> params, Long catelogId, String attrType) {
-        String key = MapUtil.get(params, "key", String.class);
         boolean isBase = "base".equalsIgnoreCase(attrType);
 
         QueryWrapper<AttrEntity> queryWrapper = new QueryWrapper<>();
 
         //设置类型匹配和模糊查询和id查询
-        queryWrapper.eq("attr_type", isBase ? 1 : 0).and((wrapper) ->
-                wrapper.eq("attr_id", key).or().like("attr_name", key));
+        queryWrapper.eq("attr_type", isBase ? 1 : 0);
+
+        String key = MapUtil.get(params, "key", String.class);
+        if (StrUtil.isNotBlank(key)) {
+            queryWrapper.and((wrapper) -> wrapper
+                    .eq("attr_id", key).or()
+                    .like("attr_name", key));
+        }
 
         //分类id不为0才拼接条件
         queryWrapper.eq(catelogId != 0, "catelog_id", catelogId);
 
-        IPage<AttrEntity> page = this.page(
+        IPage<AttrEntity> page = baseMapper.selectPage(
                 new Query<AttrEntity>().getPage(params), queryWrapper
         );
 
@@ -192,6 +198,47 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         }
 
         relationDao.delete(queryWrapper);
+    }
+
+    @Override
+    public PageUtils findAttrNoRelation(Map<String, Object> params, Long attrGroupId) {
+        //获得当前分组所属的分类id
+        AttrGroupEntity groupEntity = attrGroupDao.selectById(attrGroupId);
+        Long catelogId = groupEntity.getCatelogId();
+
+        //获取分类id下的所有分组
+        List<AttrGroupEntity> entityList = attrGroupDao.selectList(new QueryWrapper<AttrGroupEntity>()
+                .eq("catelog_id", catelogId));
+        //提取出属性分组ID
+        List<Long> attrGroupIds = entityList.stream()
+                .map(AttrGroupEntity::getAttrGroupId)
+                .collect(Collectors.toList());
+
+        //查询出关联表中所关联的数据
+        List<AttrAttrgroupRelationEntity> relationEntities = relationDao.selectList(new QueryWrapper<AttrAttrgroupRelationEntity>()
+                .in("attr_group_id", attrGroupIds));
+        //提取出关联信息的attrId
+        List<Long> attrIds = relationEntities.stream()
+                .map(AttrAttrgroupRelationEntity::getAttrId)
+                .collect(Collectors.toList());
+
+        //查询出不包含attrIds的所有指定分类下的数据
+        QueryWrapper<AttrEntity> queryWrapper = new QueryWrapper<AttrEntity>()
+                .eq("catelog_id", catelogId)
+                .eq("attr_type", ProductConstant.AttrEnum.ATTR_BASE.getCode())
+                .notIn(CollectionUtil.isNotEmpty(attrIds), "attr_id", attrIds);
+
+        String key = MapUtil.get(params, "key", String.class);
+        if (StrUtil.isNotBlank(key)) {
+            queryWrapper.eq("attr_id", key).or()
+                    .like("attr_name", key);
+        }
+
+        IPage<AttrEntity> page = baseMapper.selectPage(
+                new Query<AttrEntity>().getPage(params), queryWrapper
+        );
+
+        return new PageUtils(page);
     }
 
 }

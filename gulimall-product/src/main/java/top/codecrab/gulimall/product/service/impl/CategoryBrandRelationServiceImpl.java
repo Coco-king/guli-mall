@@ -15,7 +15,9 @@ import top.codecrab.gulimall.product.entity.CategoryEntity;
 import top.codecrab.gulimall.product.service.CategoryBrandRelationService;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 品牌分类关联
@@ -52,6 +54,18 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
         categoryBrandRelation.setBrandName(brandEntity.getName());
         categoryBrandRelation.setCatelogName(categoryEntity.getName());
         baseMapper.insert(categoryBrandRelation);
+    }
+
+    @Override
+    public List<BrandEntity> getBrandsByCatId(Long catId) {
+        List<CategoryBrandRelationEntity> entities = baseMapper.selectList(new QueryWrapper<CategoryBrandRelationEntity>()
+                .eq("catelog_id", catId));
+
+        List<Long> brandIds = entities.stream()
+                .map(CategoryBrandRelationEntity::getBrandId)
+                .collect(Collectors.toList());
+
+        return brandDao.selectBatchIds(brandIds);
     }
 
 }

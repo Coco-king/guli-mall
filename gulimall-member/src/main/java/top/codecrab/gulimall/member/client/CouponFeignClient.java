@@ -9,7 +9,7 @@ import top.codecrab.common.response.R;
  * @since 2021年05月29日 13:41
  */
 @FeignClient("gulimall-coupon")
-public interface CouponClient {
+public interface CouponFeignClient {
 
     /**
      * 查询优惠列表
