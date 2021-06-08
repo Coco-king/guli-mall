@@ -1,14 +1,18 @@
 package top.codecrab.gulimall.product.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.web.bind.annotation.*;
 import top.codecrab.common.response.R;
 import top.codecrab.common.utils.PageUtils;
+import top.codecrab.gulimall.product.entity.ProductAttrValueEntity;
 import top.codecrab.gulimall.product.service.AttrService;
+import top.codecrab.gulimall.product.service.ProductAttrValueService;
 import top.codecrab.gulimall.product.vo.AttrResponseVo;
 import top.codecrab.gulimall.product.vo.AttrVo;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +27,17 @@ public class AttrController {
 
     @Resource
     private AttrService attrService;
+
+    @Resource
+    private ProductAttrValueService productAttrValueService;
+
+    @GetMapping("/base/listforspu/{spuId}")
+    private R baseList(@PathVariable Long spuId) {
+        List<ProductAttrValueEntity> entities = productAttrValueService.list(new QueryWrapper<ProductAttrValueEntity>()
+                .eq("spu_id", spuId));
+
+        return R.ok().put("data", entities);
+    }
 
     @GetMapping("/{attrType}/list/{catelogId}")
     private R baseList(
@@ -72,6 +87,19 @@ public class AttrController {
     @PutMapping("/update")
     public R update(@RequestBody AttrVo attr) {
         attrService.updateAttr(attr);
+
+        return R.ok();
+    }
+
+    /**
+     * 修改商品规格
+     */
+    @PutMapping("/update/{spuId}")
+    public R updateBaseAddr(
+            @PathVariable Long spuId,
+            @RequestBody List<ProductAttrValueEntity> entities
+    ) {
+        productAttrValueService.updateBaseAddr(spuId, entities);
 
         return R.ok();
     }

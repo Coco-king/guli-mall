@@ -10,7 +10,9 @@ import top.codecrab.gulimall.product.dao.ProductAttrValueDao;
 import top.codecrab.gulimall.product.entity.ProductAttrValueEntity;
 import top.codecrab.gulimall.product.service.ProductAttrValueService;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * spu属性值
@@ -29,6 +31,19 @@ public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueDao
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void updateBaseAddr(Long spuId, List<ProductAttrValueEntity> entities) {
+        //先删除spu对应的属性
+        baseMapper.delete(new QueryWrapper<ProductAttrValueEntity>()
+                .eq("spu_id", spuId));
+
+        //再添加
+        List<ProductAttrValueEntity> collect = entities.stream()
+                .peek(entity -> entity.setSpuId(spuId))
+                .collect(Collectors.toList());
+        this.saveBatch(collect);
     }
 
 }

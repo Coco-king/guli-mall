@@ -44,6 +44,15 @@ public enum ErrorCodeEnum {
     REMOVE_FILE_URL_NULL_ERROR(10304, "删除的图片路径不能为空"),
 
     /**
+     * 业务逻辑错误
+     */
+    PURCHASE_STATUS_NOT_CREATED_OR_ASSIGNED(14101, "采购单状态必须是新建或已分配才可以添加采购需求"),
+    PURCHASE_DETAIL_STATUS_NOT_CREATED_OR_ASSIGNED(14102, "采购项状态必须是新建或已分配才可以合并"),
+    PURCHASE_DETAIL_STATUS_MUST_BE_BUYING(14103, "采购项状态必须是采购中才可以标记完成"),
+    PURCHASE_DETAIL_STATUS_UNKNOWN(14104, "采购项状态有误（采购成功/采购失败）"),
+    PURCHASE_DETAIL_NOT_FIND(14201, "采购项未找到"),
+
+    /**
      * 业务限流
      */
     ALIYUN_SMS_LIMIT_CONTROL_ERROR(-502, "短信发送过于频繁");

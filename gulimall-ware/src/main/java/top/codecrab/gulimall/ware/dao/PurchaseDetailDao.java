@@ -5,8 +5,6 @@ import org.apache.ibatis.annotations.Mapper;
 import top.codecrab.gulimall.ware.entity.PurchaseDetailEntity;
 
 /**
- * 
- *
  * @author codecrab
  * @date 2021-05-28 22:50:44
  */

@@ -2,6 +2,7 @@ package top.codecrab.gulimall.product.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -64,9 +65,21 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        String key = MapUtil.getStr(params, "key");
+        String status = MapUtil.getStr(params, "status");
+        String brandId = MapUtil.getStr(params, "brandId");
+        String catelogId = MapUtil.getStr(params, "catelogId");
+
         IPage<SpuInfoEntity> page = this.page(
                 new Query<SpuInfoEntity>().getPage(params),
                 new QueryWrapper<SpuInfoEntity>()
+                        .eq(StrUtil.isNotBlank(status), "publish_status", status)
+                        .eq(StrUtil.isNotBlank(brandId) && !"0".equals(brandId), "brand_id", brandId)
+                        .eq(StrUtil.isNotBlank(catelogId) && !"0".equals(catelogId), "catalog_id", catelogId)
+                        .and(StrUtil.isNotBlank(key), wrapper -> wrapper
+                                .eq("id", key).or()
+                                .like("spu_name", key)
+                        )
         );
 
         return new PageUtils(page);
