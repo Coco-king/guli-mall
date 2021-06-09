@@ -10,11 +10,11 @@ import javax.annotation.Resource;
 class GulimallSearchApplicationTests {
 
     @Resource
-    private RestHighLevelClient esRestClient;
+    private RestHighLevelClient restHighLevelClient;
 
     @Test
     void contextLoads() {
-        System.out.println(esRestClient);
+        System.out.println(restHighLevelClient);
     }
 
 }
