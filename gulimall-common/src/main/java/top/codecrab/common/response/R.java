@@ -1,6 +1,9 @@
 package top.codecrab.common.response;
 
+import cn.hutool.core.lang.TypeReference;
+import cn.hutool.json.JSONUtil;
 import org.apache.http.HttpStatus;
+import top.codecrab.common.constant.FeignConstant;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,5 +72,19 @@ public class R extends HashMap<String, Object> {
 
     public Integer getCode() {
         return (Integer) this.get("code");
+    }
+
+    public Object getFeignData() {
+        return this.get(FeignConstant.FEIGN_RESP_KEY);
+    }
+
+    public <T> T getFeignData(TypeReference<T> typeReference) {
+        Object feignData = this.getFeignData();
+        String jsonStr = JSONUtil.toJsonStr(feignData);
+        return JSONUtil.toBean(jsonStr, typeReference, true);
+    }
+
+    public R setFeignData(Object o) {
+        return this.put(FeignConstant.FEIGN_RESP_KEY, o);
     }
 }

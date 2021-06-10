@@ -2,6 +2,7 @@ package top.codecrab.gulimall.product.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import top.codecrab.gulimall.product.entity.SpuInfoEntity;
 
 /**
@@ -13,4 +14,5 @@ import top.codecrab.gulimall.product.entity.SpuInfoEntity;
 @Mapper
 public interface SpuInfoDao extends BaseMapper<SpuInfoEntity> {
 
+    void updateStatus(@Param("spuId") Long spuId, @Param("code") int code);
 }

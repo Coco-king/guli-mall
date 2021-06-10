@@ -18,5 +18,7 @@ public interface ProductAttrValueService extends IService<ProductAttrValueEntity
     PageUtils queryPage(Map<String, Object> params);
 
     void updateBaseAddr(Long spuId, List<ProductAttrValueEntity> entities);
+
+    List<ProductAttrValueEntity> getBaseAttrBySpuId(Long spuId);
 }
 

@@ -1,6 +1,5 @@
 package top.codecrab.gulimall.product.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.web.bind.annotation.*;
 import top.codecrab.common.response.R;
 import top.codecrab.common.utils.PageUtils;
@@ -33,8 +32,7 @@ public class AttrController {
 
     @GetMapping("/base/listforspu/{spuId}")
     private R baseList(@PathVariable Long spuId) {
-        List<ProductAttrValueEntity> entities = productAttrValueService.list(new QueryWrapper<ProductAttrValueEntity>()
-                .eq("spu_id", spuId));
+        List<ProductAttrValueEntity> entities = productAttrValueService.getBaseAttrBySpuId(spuId);
 
         return R.ok().put("data", entities);
     }

@@ -1,9 +1,11 @@
 package top.codecrab.gulimall.ware.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import top.codecrab.common.to.SkuHasStockTo;
 import top.codecrab.common.utils.PageUtils;
 import top.codecrab.gulimall.ware.entity.WareSkuEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,5 +22,7 @@ public interface WareSkuService extends IService<WareSkuEntity> {
      * 更新库存
      */
     void updateStock(Long skuId, Long wareId, Integer skuNum);
+
+    List<SkuHasStockTo> getSkusHasStock(List<Long> skuIds);
 }
 

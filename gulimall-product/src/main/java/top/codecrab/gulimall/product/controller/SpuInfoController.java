@@ -48,6 +48,16 @@ public class SpuInfoController {
     /**
      * 保存
      */
+    @PostMapping("/{spuId}/up")
+    public R up(@PathVariable Long spuId) {
+        spuInfoService.up(spuId);
+
+        return R.ok();
+    }
+
+    /**
+     * 保存
+     */
     @PostMapping("/save")
     public R save(@RequestBody SpuSaveVo saveVo) {
         spuInfoService.saveSpuInfo(saveVo);

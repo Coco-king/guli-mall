@@ -1,13 +1,15 @@
 package top.codecrab.gulimall.ware.controller;
 
 import org.springframework.web.bind.annotation.*;
-import top.codecrab.common.utils.PageUtils;
 import top.codecrab.common.response.R;
+import top.codecrab.common.to.SkuHasStockTo;
+import top.codecrab.common.utils.PageUtils;
 import top.codecrab.gulimall.ware.entity.WareSkuEntity;
 import top.codecrab.gulimall.ware.service.WareSkuService;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,6 +44,16 @@ public class WareSkuController {
         WareSkuEntity wareSku = wareSkuService.getById(id);
 
         return R.ok().put("wareSku", wareSku);
+    }
+
+    /**
+     * 远程调用接口，查询是否有库存
+     */
+    @PostMapping("/has-stock")
+    public R hasStock(@RequestBody List<Long> skuIds) {
+        List<SkuHasStockTo> hasStock = wareSkuService.getSkusHasStock(skuIds);
+
+        return R.ok().setFeignData(hasStock);
     }
 
     /**

@@ -1,8 +1,9 @@
 package top.codecrab.gulimall.product.controller;
 
 import org.springframework.web.bind.annotation.*;
-import top.codecrab.common.utils.PageUtils;
+import top.codecrab.common.constant.FeignConstant;
 import top.codecrab.common.response.R;
+import top.codecrab.common.utils.PageUtils;
 import top.codecrab.gulimall.product.entity.SkuInfoEntity;
 import top.codecrab.gulimall.product.service.SkuInfoService;
 
@@ -33,7 +34,6 @@ public class SkuInfoController {
         return R.ok().put("page", page);
     }
 
-
     /**
      * 信息
      */
@@ -42,6 +42,16 @@ public class SkuInfoController {
         SkuInfoEntity skuInfo = skuInfoService.getById(skuId);
 
         return R.ok().put("skuInfo", skuInfo);
+    }
+
+    /**
+     * 信息
+     */
+    @GetMapping("/info/name/{skuId}")
+    public R skuInfoName(@PathVariable("skuId") Long skuId) {
+        SkuInfoEntity skuInfo = skuInfoService.getById(skuId);
+
+        return R.ok().put(FeignConstant.FEIGN_RESP_KEY, skuInfo.getSkuName());
     }
 
     /**

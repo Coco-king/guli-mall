@@ -12,7 +12,7 @@ import top.codecrab.common.response.R;
 @FeignClient("gulimall-product")
 public interface ProductFeignClient {
 
-    @GetMapping("/product/skuinfo/info/{skuId}")
-    R info(@PathVariable("skuId") Long skuId);
+    @GetMapping("/product/skuinfo/info/name/{skuId}")
+    R skuInfoName(@PathVariable("skuId") Long skuId);
 
 }

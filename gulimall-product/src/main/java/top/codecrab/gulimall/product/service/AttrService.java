@@ -9,6 +9,7 @@ import top.codecrab.gulimall.product.vo.AttrVo;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 商品属性
@@ -33,5 +34,7 @@ public interface AttrService extends IService<AttrEntity> {
     void removeRelations(List<AttrRelationVo> relationVos);
 
     PageUtils findAttrNoRelation(Map<String, Object> params, Long attrGroupId);
+
+    Set<Long> getSearchAttrIds(Set<Long> attrIds);
 }
 

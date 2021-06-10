@@ -3,8 +3,9 @@ package top.codecrab.gulimall.coupon.controller;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
-import top.codecrab.common.utils.PageUtils;
+import top.codecrab.common.constant.FeignConstant;
 import top.codecrab.common.response.R;
+import top.codecrab.common.utils.PageUtils;
 import top.codecrab.gulimall.coupon.entity.CouponEntity;
 import top.codecrab.gulimall.coupon.service.CouponService;
 
@@ -49,7 +50,7 @@ public class CouponController {
         CouponEntity couponEntity = new CouponEntity();
         couponEntity.setCouponName("满5000减400");
 
-        return R.ok().put("coupons", Collections.singletonList(couponEntity));
+        return R.ok().put(FeignConstant.FEIGN_RESP_KEY, Collections.singletonList(couponEntity));
     }
 
     /**

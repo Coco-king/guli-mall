@@ -43,6 +43,8 @@ public enum ErrorCodeEnum {
     CATEGORY_NAME_NULL_ERROR(10203, "商品分类名称不能为空"),
     REMOVE_FILE_URL_NULL_ERROR(10304, "删除的图片路径不能为空"),
 
+    PRODUCT_UP_ERROR(11000, "商品上架异常"),
+
     /**
      * 业务逻辑错误
      */
