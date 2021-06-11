@@ -3,6 +3,7 @@ package top.codecrab.gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.codecrab.common.utils.PageUtils;
 import top.codecrab.gulimall.product.entity.CategoryEntity;
+import top.codecrab.gulimall.product.web.vo.Catalog2Vo;
 
 import java.util.List;
 import java.util.Map;
@@ -33,5 +34,9 @@ public interface CategoryService extends IService<CategoryEntity> {
      * 更新分类和关联的冗余字段
      */
     void updateDetail(CategoryEntity category);
+
+    List<CategoryEntity> getLevel1Categories();
+
+    Map<String, List<Catalog2Vo>> getCatalogJson();
 }
 

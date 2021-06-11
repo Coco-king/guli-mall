@@ -13,6 +13,7 @@ import top.codecrab.gulimall.product.entity.CategoryBrandRelationEntity;
 import top.codecrab.gulimall.product.entity.CategoryEntity;
 import top.codecrab.gulimall.product.service.CategoryBrandRelationService;
 import top.codecrab.gulimall.product.service.CategoryService;
+import top.codecrab.gulimall.product.web.vo.Catalog2Vo;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -76,6 +77,48 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                         .set("catelog_name", category.getName())
                         .eq("catelog_id", category.getCatId())
         );
+    }
+
+    @Override
+    public List<CategoryEntity> getLevel1Categories() {
+        return baseMapper.selectList(new QueryWrapper<CategoryEntity>()
+                .eq("parent_cid", 0));
+    }
+
+    @Override
+    public Map<String, List<Catalog2Vo>> getCatalogJson() {
+        List<CategoryEntity> categories = this.getLevel1Categories();
+
+        return categories.stream().collect(Collectors.toMap(
+                //key为一级分类的id
+                l1 -> l1.getCatId().toString(),
+                //value通过一级分类id查询出他的所有子分类，并封装为Catalog2Vo
+                l1 -> this.getChildrenByParentCid(l1).stream()
+                        .map(l2 -> {
+                            //通过二级分类id查询出他的所有子分类，并封装为Catalog3Vo
+                            List<Catalog2Vo.Catalog3Vo> catalog3Vos = this.getChildrenByParentCid(l2).stream()
+                                    .map(l3 -> new Catalog2Vo.Catalog3Vo(
+                                            l2.getCatId().toString(),
+                                            l3.getCatId().toString(),
+                                            l3.getName()
+                                    ))
+                                    .collect(Collectors.toList());
+                            //封装返回Catalog2Vo
+                            return new Catalog2Vo(
+                                    l1.getCatId().toString(),
+                                    catalog3Vos,
+                                    l2.getCatId().toString(),
+                                    l2.getName()
+                            );
+                        })
+                        .collect(Collectors.toList())
+                )
+        );
+    }
+
+    private List<CategoryEntity> getChildrenByParentCid(CategoryEntity l2) {
+        return baseMapper.selectList(new QueryWrapper<CategoryEntity>()
+                .eq("parent_cid", l2.getCatId()));
     }
 
     /**
