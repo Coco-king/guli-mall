@@ -3,6 +3,7 @@ package top.codecrab.gulimall.product.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,16 +88,17 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     public Map<String, List<Catalog2Vo>> getCatalogJson() {
-        List<CategoryEntity> categories = this.getLevel1Categories();
+        List<CategoryEntity> list = baseMapper.selectList(Wrappers.emptyWrapper());
+        List<CategoryEntity> categories = this.getChildrenByParentCid(list, 0L);
 
         return categories.stream().collect(Collectors.toMap(
                 //key为一级分类的id
                 l1 -> l1.getCatId().toString(),
                 //value通过一级分类id查询出他的所有子分类，并封装为Catalog2Vo
-                l1 -> this.getChildrenByParentCid(l1).stream()
+                l1 -> this.getChildrenByParentCid(list, l1.getCatId()).stream()
                         .map(l2 -> {
                             //通过二级分类id查询出他的所有子分类，并封装为Catalog3Vo
-                            List<Catalog2Vo.Catalog3Vo> catalog3Vos = this.getChildrenByParentCid(l2).stream()
+                            List<Catalog2Vo.Catalog3Vo> catalog3Vos = this.getChildrenByParentCid(list, l2.getCatId()).stream()
                                     .map(l3 -> new Catalog2Vo.Catalog3Vo(
                                             l2.getCatId().toString(),
                                             l3.getCatId().toString(),
@@ -116,9 +118,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         );
     }
 
-    private List<CategoryEntity> getChildrenByParentCid(CategoryEntity l2) {
-        return baseMapper.selectList(new QueryWrapper<CategoryEntity>()
-                .eq("parent_cid", l2.getCatId()));
+    /**
+     * 从给定的集合中过滤出指定父id的子分类
+     */
+    private List<CategoryEntity> getChildrenByParentCid(List<CategoryEntity> list, Long parentCid) {
+        return list.stream().filter(item -> item.getParentCid().equals(parentCid)).collect(Collectors.toList());
     }
 
     /**
