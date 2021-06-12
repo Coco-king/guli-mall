@@ -6,11 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import top.codecrab.gulimall.product.entity.CategoryEntity;
 import top.codecrab.gulimall.product.service.CategoryService;
-import top.codecrab.gulimall.product.web.vo.Catalog2Vo;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author codecrab
@@ -38,9 +36,12 @@ public class IndexController {
         return "index";
     }
 
+    /**
+     * @return "Map<String, List<Catalog2Vo>>"类型数据
+     */
     @ResponseBody
     @GetMapping("/index/catalog.json")
-    public Map<String, List<Catalog2Vo>> catalogJson() {
+    public Object catalogJson() {
         return categoryService.getCatalogJson();
     }
 

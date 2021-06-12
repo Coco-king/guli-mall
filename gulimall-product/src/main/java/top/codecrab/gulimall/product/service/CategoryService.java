@@ -3,7 +3,6 @@ package top.codecrab.gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.codecrab.common.utils.PageUtils;
 import top.codecrab.gulimall.product.entity.CategoryEntity;
-import top.codecrab.gulimall.product.web.vo.Catalog2Vo;
 
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,9 @@ public interface CategoryService extends IService<CategoryEntity> {
 
     List<CategoryEntity> getLevel1Categories();
 
-    Map<String, List<Catalog2Vo>> getCatalogJson();
+    /**
+     * @return "Map<String, List<Catalog2Vo>>"类型数据
+     */
+    Object getCatalogJson();
 }
 
