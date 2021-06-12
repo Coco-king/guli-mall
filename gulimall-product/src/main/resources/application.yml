@@ -16,6 +16,9 @@ spring:
         namespace: 999f941b-0bbf-4574-b1f9-e24ff6e341ab
   thymeleaf:
     cache: false
+  redis:
+    host: 192.168.66.230
+    port: 6379
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
   global-config:
