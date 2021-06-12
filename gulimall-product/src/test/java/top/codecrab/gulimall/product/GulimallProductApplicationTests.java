@@ -16,8 +16,8 @@ class GulimallProductApplicationTests {
     @Resource
     private BrandService brandService;
 
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    @Resource(name = "stringRedisTemplate")
+    private StringRedisTemplate redisTemplate;
 
     @Test
     void contextLoads() {
@@ -38,7 +38,7 @@ class GulimallProductApplicationTests {
         //每次操作都需要再次输入key
         //ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
         //指定一个key，用这个取值或存值都不需要在输入key
-        BoundValueOperations<String, String> ops = stringRedisTemplate.boundValueOps("hello");
+        BoundValueOperations<String, String> ops = redisTemplate.boundValueOps("hello");
         ops.set(UUID.fastUUID().toString());
         System.out.println("存入的UUID：" + ops.get());
     }
