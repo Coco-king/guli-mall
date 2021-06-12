@@ -9,6 +9,7 @@ import top.codecrab.gulimall.product.entity.BrandEntity;
 import top.codecrab.gulimall.product.service.BrandService;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 
 @SpringBootTest
 class GulimallProductApplicationTests {
@@ -42,6 +43,7 @@ class GulimallProductApplicationTests {
         Hello hello = new Hello();
         hello.setName("Lucy");
         hello.setAge(18);
+        hello.setBirthday(LocalDateTime.now());
         ops.set(hello);
         System.out.println("存入的对象：" + ops.get());
     }
@@ -50,5 +52,6 @@ class GulimallProductApplicationTests {
     static class Hello {
         private String name;
         private Integer age;
+        private LocalDateTime birthday;
     }
 }
