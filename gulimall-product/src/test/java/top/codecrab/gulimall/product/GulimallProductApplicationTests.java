@@ -1,10 +1,10 @@
 package top.codecrab.gulimall.product;
 
-import cn.hutool.core.lang.UUID;
+import lombok.Data;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.BoundValueOperations;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import top.codecrab.gulimall.product.entity.BrandEntity;
 import top.codecrab.gulimall.product.service.BrandService;
 
@@ -16,8 +16,8 @@ class GulimallProductApplicationTests {
     @Resource
     private BrandService brandService;
 
-    @Resource(name = "stringRedisTemplate")
-    private StringRedisTemplate redisTemplate;
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Test
     void contextLoads() {
@@ -36,10 +36,19 @@ class GulimallProductApplicationTests {
     @Test
     void testRedis() {
         //每次操作都需要再次输入key
-        //ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+        //ValueOperations<String, Object> ops = redisTemplate.opsForValue();
         //指定一个key，用这个取值或存值都不需要在输入key
-        BoundValueOperations<String, String> ops = redisTemplate.boundValueOps("hello");
-        ops.set(UUID.fastUUID().toString());
-        System.out.println("存入的UUID：" + ops.get());
+        BoundValueOperations<String, Object> ops = redisTemplate.boundValueOps("hello");
+        Hello hello = new Hello();
+        hello.setName("Lucy");
+        hello.setAge(18);
+        ops.set(hello);
+        System.out.println("存入的对象：" + ops.get());
+    }
+
+    @Data
+    static class Hello {
+        private String name;
+        private Integer age;
     }
 }
