@@ -22,6 +22,15 @@ public class IndexController {
     @Resource
     private CategoryService categoryService;
 
+    /**
+     * 性能压测简单测试
+     */
+    @ResponseBody
+    @GetMapping("/hello")
+    public String hello() {
+        return "hello";
+    }
+
     @GetMapping({"/", "index.html"})
     public String indexPage(Model model) {
         List<CategoryEntity> categories = categoryService.getLevel1Categories();
