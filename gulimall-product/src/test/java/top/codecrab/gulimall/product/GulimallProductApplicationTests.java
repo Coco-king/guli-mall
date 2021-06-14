@@ -2,6 +2,7 @@ package top.codecrab.gulimall.product;
 
 import lombok.Data;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RedissonClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,6 +21,9 @@ class GulimallProductApplicationTests {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Resource
+    private RedissonClient redisson;
+
     @Test
     void contextLoads() {
         BrandEntity brandEntity = new BrandEntity();
@@ -32,6 +36,11 @@ class GulimallProductApplicationTests {
 
         boolean save = brandService.save(brandEntity);
         System.out.println("执行保存：" + save);
+    }
+
+    @Test
+    void testRedisson() {
+        System.out.println(redisson);
     }
 
     @Test
