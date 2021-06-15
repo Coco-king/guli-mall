@@ -21,13 +21,13 @@ import org.elasticsearch.search.aggregations.metrics.AvgAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import top.codecrab.gulimall.search.config.ElasticsearchConfig;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.Arrays;
 
-@SpringBootTest
+//@SpringBootTest
 class GulimallSearchApplicationTests {
 
     @Resource
@@ -35,7 +35,8 @@ class GulimallSearchApplicationTests {
 
     @Test
     void contextLoads() {
-        System.out.println(restHighLevelClient);
+        System.out.println(Arrays.toString("_111".split("_")));
+        System.out.println("111_".substring(0, "111_".length() - 1));
     }
 
     /**

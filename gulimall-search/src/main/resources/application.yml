@@ -9,6 +9,8 @@ spring:
         server-addr: localhost:8848
         group: dev
         namespace: 999f941b-0bbf-4574-b1f9-e24ff6e341ab
+  thymeleaf:
+    cache: false
 logging:
   level:
     top.codecrab.gulimall: debug
