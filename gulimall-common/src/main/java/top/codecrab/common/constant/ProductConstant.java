@@ -9,6 +9,8 @@ import lombok.Getter;
  */
 public class ProductConstant {
 
+    public static final String MODEL_NAME = "product";
+
     @Getter
     @AllArgsConstructor
     public enum AttrEnum {

@@ -8,12 +8,17 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import top.codecrab.common.constant.ProductConstant;
 import top.codecrab.common.constant.RedisConstant;
 import top.codecrab.common.utils.PageUtils;
 import top.codecrab.common.utils.Query;
@@ -43,6 +48,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    private RedissonClient redisson;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -80,7 +88,12 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return path;
     }
 
+    /**
+     * CacheEvict：失效模式
+     * CachePut：双写模式
+     */
     @Override
+    @CacheEvict(value = "catalog", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void updateDetail(CategoryEntity category) {
         baseMapper.updateById(category);
@@ -92,10 +105,21 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         );
     }
 
+    /**
+     * Cacheable：如果指定缓存中有该方法返回值的数据，就不执行该方法，直接从缓存中取值
+     */
     @Override
+    @Cacheable(value = "catalog", key = "#root.methodName", sync = true)
     public List<CategoryEntity> getLevel1Categories() {
+        System.out.println("执行了getLevel1Categories...");
         return baseMapper.selectList(new QueryWrapper<CategoryEntity>()
                 .eq("parent_cid", 0));
+    }
+
+    @Override
+    @Cacheable(value = "catalog", key = "#root.methodName", sync = true)
+    public Object getCatalogJson() {
+        return this.getCatalogJsonFormDb();
     }
 
     /**
@@ -110,18 +134,30 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      * 原因：当大量请求同时访问一个热点key的时候，这个key突然过期，这些请求同时去查询数据库，导致数据库崩溃
      * 解决方案：设置一个锁，当大量请求同时进来时，第一个请求拿到锁，去查询数据库并放入缓存。后面的请求拿到锁之后，缓存中已经有数据了
      */
-    @Override
-    public Object getCatalogJson() {
-        BoundValueOperations<String, Object> ops = redisTemplate.boundValueOps(RedisConstant.CategoryConstant.REDIS_KEY);
+    public Object getCatalogJson2() {
+        BoundValueOperations<String, Object> ops = redisTemplate.boundValueOps(RedisConstant.Category.KEY);
 
         Object result = ops.get();
         //redis中没有找到，就查询数据库，否则直接返回
         if (result == null) {
             //如果是分布式，那么有几个本服务，那么请求就会进来几个，所以需要使用分布式锁
-            return getCatalogJsonFormDbWithRedisLock(ops);
+            return getCatalogJsonFormDbWithRedissonLock(ops);
         }
         System.out.println("从缓存中获取...");
         return result;
+    }
+
+    private Object getCatalogJsonFormDbWithRedissonLock(BoundValueOperations<String, Object> ops) {
+        RLock lock = redisson.getLock(RedisConstant.REDISSON_LOCK(ProductConstant.MODEL_NAME, RedisConstant.Category.TYPE));
+        lock.lock();
+        System.out.println("获取分布式锁成功...");
+        Object data;
+        try {
+            data = this.getDataFromDbOrCache(ops);
+        } finally {
+            lock.unlock();
+        }
+        return data;
     }
 
     private Object getCatalogJsonFormDbWithRedisLock(BoundValueOperations<String, Object> ops) {
@@ -133,7 +169,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         这一步设置删除时间的目的是当业务加完锁之后出现异常或是服务器宕机，lock锁不会锁死
         这一步必须是原子性的，也就是一步完成，否则中途服务器宕机还是会导致过期时间设置不上
         */
-        Boolean absent = lock.setIfAbsent(RedisConstant.REDIS_LOCK, uuid, 300, TimeUnit.SECONDS);
+        Boolean absent = lock.setIfAbsent(RedisConstant.LOCK, uuid, 300, TimeUnit.SECONDS);
 
         //表示占锁成功
         if (absent != null && absent) {
@@ -151,7 +187,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                 String script = "if redis.call('get',KEYS[1]) == ARGV[1] then return redis.call('del',KEYS[1]) else return 0 end";
                 redisTemplate.execute(
                         new DefaultRedisScript<>(script, Long.class),
-                        Collections.singletonList(RedisConstant.REDIS_LOCK),
+                        Collections.singletonList(RedisConstant.LOCK),
                         uuid
                 );
             }
@@ -191,7 +227,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         Map<String, List<Catalog2Vo>> jsonFormDb = this.getCatalogJsonFormDb();
         if (MapUtil.isEmpty(jsonFormDb)) {
             //如果为空就设置空映射，防止缓存穿透
-            ops.set(RedisConstant.REDIS_NULL_MAP, 30, TimeUnit.SECONDS);
+            ops.set(RedisConstant.NULL_MAP, 30, TimeUnit.SECONDS);
         } else {
             int oneDay = 86400;
             //随机时间 5-10分钟，解决缓存雪崩
@@ -202,6 +238,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     private Map<String, List<Catalog2Vo>> getCatalogJsonFormDb() {
+        System.out.println("查询了数据库...");
         List<CategoryEntity> list = baseMapper.selectList(Wrappers.emptyWrapper());
         List<CategoryEntity> categories = this.getChildrenByParentCid(list, 0L);
 

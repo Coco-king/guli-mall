@@ -9,12 +9,17 @@ import java.util.Map;
  */
 public interface RedisConstant {
 
-    String REDIS_PREFIX = "gulimall:";
-    String REDIS_LOCK = REDIS_PREFIX + "lock";
-    String REDIS_NULL_STR = "RESULT_IS_NULL";
-    Map<String, Object> REDIS_NULL_MAP = Collections.emptyMap();
+    String PREFIX = "gulimall:";
+    String LOCK = PREFIX + "lock";
+    String NULL_STR = "RESULT_IS_NULL";
+    Map<String, Object> NULL_MAP = Collections.emptyMap();
 
-    interface CategoryConstant {
-        String REDIS_KEY = REDIS_PREFIX + "catalogJson";
+    static String REDISSON_LOCK(String model, String type) {
+        return PREFIX + model + ":" + type + "-lock";
+    }
+
+    interface Category {
+        String TYPE = "catalogJson";
+        String KEY = PREFIX + TYPE;
     }
 }
