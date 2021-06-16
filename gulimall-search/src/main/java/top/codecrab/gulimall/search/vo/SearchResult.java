@@ -32,6 +32,8 @@ public class SearchResult {
      */
     private Integer currPage;
 
+    private List<Integer> pageNav;
+
     //================== 以上为分页参数 ===================
 
     /**

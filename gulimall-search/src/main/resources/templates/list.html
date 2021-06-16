@@ -11,7 +11,8 @@
     <link rel="stylesheet" type="text/css" href="/static/search/font/iconfont.css">
     <!--<script src="/static/search/js/jquery-3.2.1.min.js"></script>-->
     <script src="/static/search/js/jquery-1.12.4.js"></script>
-    <title th:text="${keyword}+ ' - 商品搜索 - 谷粒商城'"> - 商品搜索 - 谷粒商城</title>
+    <title th:text="${keyword == null ? result.catalogs.get(0).catalogName : keyword}+ ' - 商品搜索 - 谷粒商城'"> - 商品搜索 -
+      谷粒商城</title>
   </head>
   <body>
     <!--头部-->
@@ -404,8 +405,8 @@
         <a href="http://www.gulimall.com"><img src="/static/search/image/logo1.jpg" alt=""></a>
       </div>
       <div class="header_form">
-        <input type="text" placeholder="手机" th:value="${keyword == null ? '' : keyword}"/>
-        <a href="#">搜索</a>
+        <input id="keyword_input" type="text" placeholder="手机" th:value="${keyword == null ? '' : keyword}"/>
+        <a href="javascript:searchKey()">搜索</a>
       </div>
       <div class="header_ico">
         <div class="header_gw">
@@ -818,7 +819,8 @@
               <div class="sl_value">
                 <ul>
                   <li th:each="cata:${result.catalogs}">
-                    <a href="#" th:href="${'javascript:searchParam(&quot;catalogId&quot;,'+cata.catalogId+')'}" th:text="${cata.catalogName}">
+                    <a href="#" th:href="${'javascript:searchParam(&quot;catalogId&quot;,'+cata.catalogId+')'}"
+                       th:text="${cata.catalogName}">
                       手机
                     </a>
                   </li>
@@ -846,7 +848,9 @@
                 <ul>
                   <li th:each="value:${attr.attrValue}">
                     <!--attrs=1_3G:4G-->
-                    <a href="#" th:href="${'javascript:searchParam(&quot;attrs&quot;,&quot;'+attr.attrId+'_'+value+'&quot;)'}" th:text="${value}">0-安卓（Android）</a>
+                    <a href="#"
+                       th:href="${'javascript:searchParam(&quot;attrs&quot;,&quot;'+attr.attrId+'_'+value+'&quot;)'}"
+                       th:text="${value}">0-安卓（Android）</a>
                   </li>
                 </ul>
               </div>
@@ -1044,11 +1048,11 @@
               <!--综合排序-->
               <div class="filter_top">
                 <div class="filter_top_left">
-                  <a href="#">综合排序</a>
-                  <a href="#">销量</a>
-                  <a href="#">价格</a>
-                  <a href="#">评论分</a>
-                  <a href="#">上架时间</a>
+                  <a class="sort_a" sort="hotScore" href="#">综合排序</a>
+                  <a class="sort_a" sort="saleCount" href="#">销量</a>
+                  <a class="sort_a" sort="skuPrice" href="#">价格</a>
+                  <!--<a href="#">评论分</a>
+                  <a href="#">上架时间</a>-->
                 </div>
                 <div class="filter_top_right">
                             <span class="fp-text">
@@ -1221,15 +1225,16 @@
               <div class="filter_page">
                 <div class="page_wrap">
                             <span class="page_span1">
-                                <a href="#">
+                                <a class="page_a" href="javascript:void(0)" th:if="${result.currPage>1}"
+                                   th:attr="pn=${result.currPage}-1">
                                     < 上一页
                                 </a>
-                                <a href="#" style="border: 0;color:#ee2222;background: #fff">1</a>
-                                <a href="#">2</a>
-                                <a href="#">3</a>
-                                <a href="#" style="border: 0;font-size: 20px;color: #999;background: #fff">...</a>
-                                <a href="#" th:text="${result.totalPage}">169</a>
-                                <a href="#">
+                                <a class="page_a" href="javascript:void(0)" th:each="nav:${result.pageNav}"
+                                   th:attr="pn=${nav},style=${result.currPage==nav?'border: 0;color:#ee2222;background: #fff':''}">
+                                  [[${nav}]]
+                                </a>
+                                <a class="page_a" href="javascript:void(0)" th:if="${result.currPage<result.totalPage}"
+                                   th:attr="pn=${result.currPage}+1">
                                     下一页 >
                                 </a>
                             </span>
@@ -1237,7 +1242,7 @@
                                 <em>共<b th:text="${result.totalPage}">169</b>页&nbsp;&nbsp;到第</em>
                                 <input type="number" value="1">
                                 <em>页</em>
-                                <a href="#">确定</a>
+                                <a href="javascript:void(0)">确定</a>
                             </span>
                 </div>
               </div>
@@ -1989,15 +1994,73 @@
         $(this).css("color", "#727272")
       })
 
+      $(".page_a").click(function () {
+        let pn = $(this).attr("pn")
+        let href = location.href.toString();
+        if (href.indexOf("currPage") === -1) {
+          location.href = href + "&currPage=" + pn;
+        } else {
+          location.href = replaceParamVal(href, "currPage", pn)
+        }
+      })
+
       function searchParam(name, value) {
-        let url = (location.href + "")
-        var string = "&" + name + "=" + value;
+        let url = location.href.toString()
+        let string = "&" + name + "=" + value;
         if (url.indexOf(string) !== -1) {
 
         } else if (url.indexOf("?") !== -1) {
           location.href = url + string;
         } else if (url.indexOf("?") === -1) {
           location.href = url + "?" + name + "=" + value;
+        }
+      }
+
+      //替换指定传入参数的值,paramName为参数,replaceWith为新值
+      function replaceParamVal(url, paramName, replaceWith) {
+        if (url.indexOf("?") === -1) {
+          return url + "?" + paramName + "=" + replaceWith;
+        } else if (url.indexOf(paramName) === -1) {
+          return url + "&" + paramName + "=" + replaceWith;
+        } else {
+          var re = eval('/(' + paramName + '=)([^&]*)/gi');
+          return url.replace(re, paramName + '=' + replaceWith);
+        }
+      }
+
+      function searchKey() {
+        let val = $("#keyword_input").val();
+        if (val) {
+          let href = location.href.toString();
+          location.href = replaceParamVal(href, "keyword", val)
+        }
+      }
+
+      $(".sort_a").click(function () {
+
+        changeStyle($(this));
+
+        if ($(this).hasClass("desc")) {
+          let sort = $(this).attr("sort") + "_desc"
+          location.href = replaceParamVal(location.href.toString(), "sort", sort)
+        } else {
+          let sort = $(this).attr("sort") + "_asc"
+          location.href = replaceParamVal(location.href.toString(), "sort", sort)
+        }
+        return false
+      })
+
+      function changeStyle($ele) {
+        $(".sort_a").css({'color': '#333', 'border-color': '#CCC', 'background': '#FFF'})
+        $(".sort_a").each(function () {
+          $(this).text($(this).text().replace("↑", "").replace("↓", ""))
+        })
+        $ele.css({'color': '#FFF', 'border-color': '#e4393c', 'background': '#e4393c'})
+        $ele.toggleClass("desc")
+        if ($ele.hasClass("desc")) {
+          $ele.text($ele.text().replace("↑", "").replace("↓", "") + "↓")
+        } else {
+          $ele.text($ele.text().replace("↑", "").replace("↓", "") + "↑")
         }
       }
     </script>

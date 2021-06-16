@@ -30,6 +30,7 @@ import top.codecrab.gulimall.search.vo.SearchResult;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -171,7 +172,11 @@ public class MallSearchServiceImpl implements MallSearchService {
             Map<String, Object> map = item.getSourceAsMap();
             SkuEsModel esModel = BeanUtil.toBean(map, SkuEsModel.class);
             HighlightField skuTitle = item.getHighlightFields().get("skuTitle");
-            esModel.setSkuTitle(skuTitle.getFragments()[0].string());
+            if (skuTitle != null) {
+                esModel.setSkuTitle(skuTitle.getFragments()[0].string());
+            } else {
+                esModel.setSkuTitle((String) item.getSourceAsMap().get("skuTitle"));
+            }
             return esModel;
         }).collect(Collectors.toList());
         searchResult.setProducts(esModels);
@@ -227,6 +232,12 @@ public class MallSearchServiceImpl implements MallSearchService {
         searchResult.setTotalCount(totalCount);
         searchResult.setCurrPage(param.getCurrPage());
         searchResult.setTotalPage((int) Math.ceil(totalCount * 1.0 / ElasticConstant.PRODUCT_PAGE_SIZE));
+
+        List<Integer> pageNav = new ArrayList<>();
+        for (int i = 1; i <= searchResult.getTotalPage(); i++) {
+            pageNav.add(i);
+        }
+        searchResult.setPageNav(pageNav);
         return searchResult;
     }
 
