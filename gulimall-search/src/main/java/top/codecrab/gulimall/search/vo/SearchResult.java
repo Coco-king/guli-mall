@@ -20,7 +20,7 @@ public class SearchResult {
     /**
      * 总记录数
      */
-    private Integer totalCount;
+    private Long totalCount;
 
     /**
      * 总页数

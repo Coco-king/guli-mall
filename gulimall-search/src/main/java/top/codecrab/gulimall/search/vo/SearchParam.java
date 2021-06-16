@@ -39,7 +39,7 @@ public class SearchParam {
     /**
      * 是否有库存： stock=0/1；1只显示有货，0或者不传都会显示
      */
-    private Integer hasStock = 1;
+    private Integer hasStock;
 
     /**
      * 可以传入多个； attrs=1_3G:4G；1号属性值为3G或者4G

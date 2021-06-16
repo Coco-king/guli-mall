@@ -7,5 +7,5 @@ package top.codecrab.gulimall.search.constant;
 public interface ElasticConstant {
     String PRODUCT_INDEX = "gulimall_product";
 
-    Integer PRODUCT_PAGE_SIZE = 2;
+    Integer PRODUCT_PAGE_SIZE = 16;
 }

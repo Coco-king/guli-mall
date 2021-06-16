@@ -23,7 +23,7 @@ public class SearchController {
     public String listPage(SearchParam param, Model model) {
         SearchResult result = mallSearchService.search(param);
         model.addAttribute("result", result);
-
+        model.addAttribute("keyword", param.getKeyword());
         return "list";
     }
 
