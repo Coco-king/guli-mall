@@ -2,7 +2,10 @@ package top.codecrab.gulimall.search.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -21,12 +24,13 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Service;
+import top.codecrab.common.response.R;
 import top.codecrab.common.to.es.SkuEsModel;
+import top.codecrab.gulimall.search.client.ProductFeignClient;
 import top.codecrab.gulimall.search.config.ElasticsearchConfig;
 import top.codecrab.gulimall.search.constant.ElasticConstant;
 import top.codecrab.gulimall.search.service.MallSearchService;
-import top.codecrab.gulimall.search.vo.SearchParam;
-import top.codecrab.gulimall.search.vo.SearchResult;
+import top.codecrab.gulimall.search.vo.*;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -40,14 +44,18 @@ import java.util.stream.Collectors;
  * @author codecrab
  * @since 2021年06月15日 17:31
  */
+@Slf4j
 @Service("mallSearchService")
 public class MallSearchServiceImpl implements MallSearchService {
 
     @Resource
     private RestHighLevelClient restHighLevelClient;
 
+    @Resource
+    private ProductFeignClient productFeignClient;
+
     @Override
-    public SearchResult search(SearchParam param) {
+    public SearchResult search(SearchParam param, String query) {
         //构建搜索dsl
         SearchRequest request = buildSearchRequest(param);
         SearchResult result = null;
@@ -55,7 +63,7 @@ public class MallSearchServiceImpl implements MallSearchService {
         try {
             SearchResponse response = restHighLevelClient.search(request, ElasticsearchConfig.COMMON_OPTIONS);
             //构建返回对象
-            result = buildSearchResult(response, param);
+            result = buildSearchResult(response, param, query);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -96,7 +104,7 @@ public class MallSearchServiceImpl implements MallSearchService {
 
         //price=0_400 或者 price=_200 或者 price=200_
         String price = param.getPrice();
-        if (StrUtil.isNotBlank(price) && price.contains("_")) {
+        if (StrUtil.isNotBlank(price) && price.contains("_") && price.length() > 1) {
             if (price.startsWith("_")) {
                 String max = price.substring(1);
                 boolQuery.filter(QueryBuilders.rangeQuery("skuPrice").lte(max));
@@ -164,7 +172,7 @@ public class MallSearchServiceImpl implements MallSearchService {
         return new SearchRequest(new String[]{ElasticConstant.PRODUCT_INDEX}, sourceBuilder);
     }
 
-    private SearchResult buildSearchResult(SearchResponse response, SearchParam param) {
+    private SearchResult buildSearchResult(SearchResponse response, SearchParam param, String query) {
         SearchResult searchResult = new SearchResult();
         SearchHits hits = response.getHits();
 
@@ -238,6 +246,86 @@ public class MallSearchServiceImpl implements MallSearchService {
             pageNav.add(i);
         }
         searchResult.setPageNav(pageNav);
+        List<SearchResult.NavVo> collect = new ArrayList<>();
+        if (CollectionUtil.isNotEmpty(param.getAttrs())) {
+            collect = param.getAttrs().stream().map(attrStr -> {
+                String[] split = attrStr.split("_");
+                if (split.length == 2) {
+                    //添加面包屑导航
+                    AttrResponseVo attr = new AttrResponseVo();
+                    try {
+                        R r = productFeignClient.attrInfo(Long.parseLong(split[0]));
+                        attr = r.getData("attr", new TypeReference<AttrResponseVo>() {
+                        });
+                    } catch (Exception e) {
+                        log.error("远程调用attrInfo失败", e);
+                    }
+
+                    //浏览器和java对空格的编码不一样
+                    String encode = URLUtil.encode(attrStr).replace("+", "%20");
+                    String replace = query.replace("&attrs=" + encode, "");
+
+                    SearchResult.NavVo navVo = new SearchResult.NavVo();
+                    navVo.setNavName(attr.getAttrName());
+                    navVo.setNavValue(split[1]);
+                    navVo.setNavLink("http://search.gulimall.com/list.html?" + replace);
+
+                    searchResult.getAttrIds().add(Long.parseLong(split[0]));
+                    return navVo;
+                }
+                return null;
+            }).collect(Collectors.toList());
+        }
+        if (param.getCatalogId() != null && param.getCatalogId() > 0) {
+            SearchResult.NavVo navVo = new SearchResult.NavVo();
+
+            CategoryVo data = new CategoryVo();
+            try {
+                R r = productFeignClient.categoryInfo(param.getCatalogId());
+                data = r.getData("data", new TypeReference<CategoryVo>() {
+                });
+            } catch (Exception e) {
+                log.error("远程调用categoryInfo失败", e);
+            }
+
+            //浏览器和java对空格的编码不一样
+            String replace = query.replace("&catalogId=" + param.getCatalogId(), "");
+            navVo.setNavLink("http://search.gulimall.com/list.html?" + replace);
+            navVo.setNavName("分类");
+            navVo.setNavValue(data.getName());
+            collect.add(navVo);
+        }
+        if (CollectionUtil.isNotEmpty(param.getBrandId())) {
+            List<String> brandNames = new ArrayList<>();
+            try {
+                R r = productFeignClient.brandInfos(param.getBrandId());
+                if (r.getCode() == 0) {
+                    brandNames = r.getFeignData(new TypeReference<List<BrandVo>>() {
+                    }).stream().map(BrandVo::getName)
+                            .collect(Collectors.toList());
+                }
+            } catch (Exception e) {
+                log.error("远程调用brandInfos失败", e);
+            }
+
+            StringBuffer q = new StringBuffer();
+            for (Long aLong : param.getBrandId()) {
+                q.append("&brandId=").append(aLong);
+            }
+            SearchResult.NavVo navVo = new SearchResult.NavVo();
+            String replace = query.replace(q.toString(), "");
+            navVo.setNavLink("http://search.gulimall.com/list.html?" + replace);
+            navVo.setNavName("品牌");
+            if (brandNames.size() > 1) {
+                String join = String.join("、", brandNames);
+                navVo.setNavValue(join);
+            } else if (!brandNames.isEmpty()) {
+                navVo.setNavValue(brandNames.get(0));
+            }
+            collect.add(navVo);
+
+        }
+        searchResult.setNavs(collect);
         return searchResult;
     }
 

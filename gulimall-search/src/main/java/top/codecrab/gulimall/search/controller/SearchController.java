@@ -8,6 +8,7 @@ import top.codecrab.gulimall.search.vo.SearchParam;
 import top.codecrab.gulimall.search.vo.SearchResult;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author codecrab
@@ -20,8 +21,8 @@ public class SearchController {
     private MallSearchService mallSearchService;
 
     @GetMapping("/list.html")
-    public String listPage(SearchParam param, Model model) {
-        SearchResult result = mallSearchService.search(param);
+    public String listPage(SearchParam param, Model model, HttpServletRequest request) {
+        SearchResult result = mallSearchService.search(param, request.getQueryString());
         model.addAttribute("result", result);
         model.addAttribute("keyword", param.getKeyword());
         return "list";

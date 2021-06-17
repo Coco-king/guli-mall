@@ -13,7 +13,8 @@ public interface MallSearchService {
      * 检索商品
      *
      * @param param 检索参数
+     * @param query 请求参数
      * @return 检索结果
      */
-    SearchResult search(SearchParam param);
+    SearchResult search(SearchParam param, String query);
 }

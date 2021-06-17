@@ -766,6 +766,13 @@
           </div>
         </div>
         <i><img src="/static/search/image/right-@1x.png" alt=""></i>
+
+        <div class="JD_ipone_one c">
+          <a th:href="${n.navLink}" th:each="n:${result.navs}" style="margin-left: 5px">
+            <span th:text="${n.navName}"></span>：
+            <span style="color: #ea3737" th:text="${n.navValue}"></span>
+          </a>
+        </div>
       </div>
     </div>
 
@@ -778,9 +785,9 @@
             <h3><b th:text="${keyword == null ? '' : keyword}">手机</b><em>商品筛选</em></h3>
             <div class="st-ext">共&nbsp;<span th:text="${result.totalCount}">10135</span>个商品</div>
           </div>
-          <div class="JD_nav_logo">
+          <div class="JD_nav_logo" th:with="brandId=${param.brandId},catalogId=${param.catalogId}">
             <!--品牌-->
-            <div class="JD_nav_wrap">
+            <div class="JD_nav_wrap" th:if="${#strings.isEmpty(brandId)}">
               <div class="sl_key">
                 <span><b>品牌：</b></span>
               </div>
@@ -812,7 +819,7 @@
               </div>
             </div>
             <!--分类-->
-            <div class=" JD_pre">
+            <div class=" JD_pre" th:if="${#strings.isEmpty(catalogId)}">
               <div class="sl_key">
                 <span><b>分类：</b></span>
               </div>
@@ -840,7 +847,7 @@
               </div>
             </div>
             <!--系统-->
-            <div class="JD_pre" th:each="attr:${result.attrs}">
+            <div class="JD_pre" th:each="attr:${result.attrs}" th:if="${!#lists.contains(result.attrIds,attr.attrId)}">
               <div class="sl_key">
                 <span th:text="${attr.attrName} + '：'">系统：</span>
               </div>
@@ -940,8 +947,8 @@
                       </div>
                     </li>
                     <li>
-                      <a href="#" title="vivo X9s 全网通 4GB+64GB 磨砂黑 移动联通电信4G手机 双卡双待"><img
-                              src="/static/search/img/5919637an271a1301.jpg"
+                      <a href="#" title="vivo X9s 全网通 4GB+64GB 磨砂黑 移动联通电信4G手机 双卡双待">
+                        <img src="/static/search/img/593ba628n8794c6a6.jpg"
                               alt=""></a>
                       <a href="#" title="【预约版】华为 HUAWEI 畅享7S 全面屏双摄 4GB +64GB 黑色 移动联通电信4G手机 双卡双待">
                         <em>vivo Xplay6 全网通 6GB+64GB 磨砂黑 移动联通电信4G手机 双卡双待</em>
@@ -1010,7 +1017,7 @@
                     </li>
                     <li>
                       <a href="#" title="vivo X9s 全网通 4GB+64GB 磨砂黑 移动联通电信4G手机 双卡双待"><img
-                              src="/static/search/img/5919637an271a1301.jpg"
+                              src="/static/search/img/593ba628n8794c6a6.jpg"
                               alt=""></a>
                       <a href="#">
                         <em>vivo Xplay6 全网通 6GB+64GB 磨砂黑 移动联通电信4G手机 双卡双待</em>
@@ -1032,7 +1039,7 @@
                 <div class="mc">
                   <ul>
                     <li>
-                      <a href="#"><img src="/static/search/img/599a806bn9d829c1c.jpg" alt=""></a>
+                      <a href="#"><img src="/static/search/img/593ba628n8794c6a6.jpg" alt=""></a>
                     </li>
                     <li>
                       <a href="#"><img src="/static/search/img/593e4de0n5ff878a4.jpg" alt=""></a>
@@ -1047,10 +1054,29 @@
             <div class="filter">
               <!--综合排序-->
               <div class="filter_top">
-                <div class="filter_top_left">
-                  <a class="sort_a" sort="hotScore" href="#">综合排序</a>
-                  <a class="sort_a" sort="saleCount" href="#">销量</a>
-                  <a class="sort_a" sort="skuPrice" href="#">价格</a>
+                <div class="filter_top_left" th:with="s=${param.sort},p=${param.price}">
+                  <a th:class="${(!#strings.isEmpty(s) && #strings.startsWith(s,'hotScore') && #strings.endsWith(s,'desc'))?'sort_a desc':'sort_a'}"
+                     th:attr="style=${(#strings.isEmpty(s) || #strings.startsWith(s,'hotScore'))?'color: #FFF;border-color: #e4393c;background: #e4393c':'color: #333;border-color: #CCC;background: #FFF'}"
+                     sort="hotScore" href="#">综合排序 [[${(!#strings.isEmpty(s) && #strings.startsWith(s,'hotScore') &&
+                    #strings.endsWith(s,'desc'))?'↓':(!#strings.isEmpty(s) &&
+                    #strings.contains(s,'hotScore')?'↑':'')}]]</a>
+                  <a th:class="${(!#strings.isEmpty(s) && #strings.startsWith(s,'saleCount') && #strings.endsWith(s,'desc'))?'sort_a desc':'sort_a'}"
+                     th:attr="style=${(!#strings.isEmpty(s) && #strings.startsWith(s,'saleCount'))?'color: #FFF;border-color: #e4393c;background: #e4393c':'color: #333;border-color: #CCC;background: #FFF'}"
+                     sort="saleCount" href="#">销量 [[${(!#strings.isEmpty(s) && #strings.startsWith(s,'saleCount') &&
+                    #strings.endsWith(s,'desc'))?'↓':(!#strings.isEmpty(s) &&
+                    #strings.contains(s,'saleCount')?'↑':'')}]]</a>
+                  <a th:class="${(!#strings.isEmpty(s) && #strings.startsWith(s,'skuPrice') && #strings.endsWith(s,'desc'))?'sort_a desc':'sort_a'}"
+                     th:attr="style=${(!#strings.isEmpty(s) && #strings.startsWith(s,'skuPrice'))?'color: #FFF;border-color: #e4393c;background: #e4393c':'color: #333;border-color: #CCC;background: #FFF'}"
+                     sort="skuPrice" href="#">价格 [[${(!#strings.isEmpty(s) && #strings.startsWith(s,'skuPrice') &&
+                    #strings.endsWith(s,'desc'))?'↓':(!#strings.isEmpty(s) &&
+                    #strings.contains(s,'skuPrice')?'↑':'')}]]</a>
+
+                  &nbsp;&nbsp;&nbsp;&nbsp;
+                  价格区间：<input id="priceFrom" type="number" style="width: 80px"
+                              th:value="${#strings.isEmpty(p)?'':#strings.substringBefore(p,'_')}"> -
+                  <input id="priceTo" type="number" style="width: 80px"
+                         th:value="${#strings.isEmpty(p)?'':#strings.substringAfter(p,'_')}">
+                  <button id="priceSearchBtn">查询</button>
                   <!--<a href="#">评论分</a>
                   <a href="#">上架时间</a>-->
                 </div>
@@ -1476,7 +1502,7 @@
             <li>
               <div class="mc_img">
                 <a href="#" title="诺基亚 7 (Nokia 7) 4GB+64GB 黑色 全网通 双卡双待 移动联通电信4G手机"><img
-                        src="img/59c493a7N3f9b9c85 (1).jpg" alt=""></a>
+                        src="/static/search/img/59c493a7N3f9b9c85 (1).jpg" alt=""></a>
               </div>
               <div class="mc_name">
                 <a href="#" title="诺基亚 7 (Nokia 7) 4GB+64GB 黑色 全网通 双卡双待 移动联通电信4G手机">
@@ -1496,7 +1522,7 @@
             <li>
               <div class="mc_img">
                 <a href="#" title="诺基亚 7 (Nokia 7) 4GB+64GB 黑色 全网通 双卡双待 移动联通电信4G手机"><img
-                        src="img/59c493a7N3f9b9c85 (1).jpg" alt=""></a>
+                        src="/static/search/img/59c493a7N3f9b9c85 (1).jpg" alt=""></a>
               </div>
               <div class="mc_name">
                 <a href="#" title="诺基亚 7 (Nokia 7) 4GB+64GB 黑色 全网通 双卡双待 移动联通电信4G手机">
@@ -1861,6 +1887,10 @@
     </div>
 
     <script>
+      if (location.href.toString() === "http://search.gulimall.com/list.html") {
+        location.href = "http://www.gulimall.com"
+      }
+
       $(".sl_ext a:nth-child(1)").hover(function () {
         $(this).children("b").stop(true).animate({top: "3px"}, 50);
         $(this).children("i").stop(true).animate({top: "-23px"}, 50)
@@ -2004,15 +2034,22 @@
         }
       })
 
+      $("#priceSearchBtn").click(function () {
+        let from = $("#priceFrom").val()
+        let to = $("#priceTo").val()
+        var href1 = replaceParamVal(location.href.toString(), "price", from + "_" + to);
+        location.href = href1
+      })
+
       function searchParam(name, value) {
         let url = location.href.toString()
         let string = "&" + name + "=" + value;
         if (url.indexOf(string) !== -1) {
 
         } else if (url.indexOf("?") !== -1) {
-          location.href = url + string;
+          location.href = (url + string).replace("#", "");
         } else if (url.indexOf("?") === -1) {
-          location.href = url + "?" + name + "=" + value;
+          location.href = (url + "?" + name + "=" + value).replace("#", "");
         }
       }
 
@@ -2024,7 +2061,7 @@
           return url + "&" + paramName + "=" + replaceWith;
         } else {
           var re = eval('/(' + paramName + '=)([^&]*)/gi');
-          return url.replace(re, paramName + '=' + replaceWith);
+          return url.replace(re, paramName + '=' + replaceWith).replace("#", "");
         }
       }
 
@@ -2038,7 +2075,8 @@
 
       $(".sort_a").click(function () {
 
-        changeStyle($(this));
+        //changeStyle($(this));
+        $(this).toggleClass("desc")
 
         if ($(this).hasClass("desc")) {
           let sort = $(this).attr("sort") + "_desc"

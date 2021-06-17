@@ -3,6 +3,7 @@ package top.codecrab.gulimall.search.vo;
 import lombok.Data;
 import top.codecrab.common.to.es.SkuEsModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,6 +52,13 @@ public class SearchResult {
      */
     private List<AttrVo> attrs;
 
+    /**
+     * 结果涉及到的所有面包屑
+     */
+    private List<NavVo> navs;
+
+    private List<Long> attrIds = new ArrayList<>();
+
 
     @Data
     public static class BrandVo {
@@ -75,5 +83,14 @@ public class SearchResult {
         private String attrName;
 
         private List<String> attrValue;
+    }
+
+    @Data
+    public static class NavVo {
+        private String navName;
+
+        private String navValue;
+
+        private String navLink;
     }
 }
