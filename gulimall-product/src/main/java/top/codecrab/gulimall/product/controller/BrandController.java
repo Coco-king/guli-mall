@@ -47,7 +47,6 @@ public class BrandController {
         return R.ok().put("page", page);
     }
 
-
     /**
      * 信息
      */
@@ -56,6 +55,16 @@ public class BrandController {
         BrandEntity brand = brandService.getById(brandId);
 
         return R.ok().put("brand", brand);
+    }
+
+    /**
+     * 信息
+     */
+    @GetMapping("/infos")
+    public R infos(@RequestParam("brandIds") List<Long> brandIds) {
+        List<BrandEntity> brands = brandService.getBrandsByIds(brandIds);
+
+        return R.ok().setFeignData(brands);
     }
 
     /**

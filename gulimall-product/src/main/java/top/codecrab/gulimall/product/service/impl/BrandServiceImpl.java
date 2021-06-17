@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.codecrab.common.utils.PageUtils;
@@ -17,6 +18,7 @@ import top.codecrab.gulimall.product.service.BrandService;
 import top.codecrab.gulimall.product.service.CategoryBrandRelationService;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,6 +59,13 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
                         .set("brand_name", brand.getName())
                         .eq("brand_id", brand.getBrandId())
         );
+    }
+
+    @Override
+    @Cacheable(value = "brand", key = "#root.methodName+#root.args[0]")
+    public List<BrandEntity> getBrandsByIds(List<Long> brandIds) {
+        return baseMapper.selectList(new QueryWrapper<BrandEntity>()
+                .in("brand_id", brandIds));
     }
 
 }

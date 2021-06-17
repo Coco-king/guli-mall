@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.codecrab.common.constant.ProductConstant;
@@ -154,6 +155,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     }
 
     @Override
+    @Cacheable(value = "attr", key = "#root.methodName+#root.args[0]")
     public AttrResponseVo getAttrResponseVo(Long attrId) {
         AttrEntity attrEntity = baseMapper.selectById(attrId);
         AttrResponseVo responseVo = BeanUtil.copyProperties(attrEntity, AttrResponseVo.class);

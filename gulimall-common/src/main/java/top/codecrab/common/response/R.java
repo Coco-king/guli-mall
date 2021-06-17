@@ -84,6 +84,12 @@ public class R extends HashMap<String, Object> {
         return JSONUtil.toBean(jsonStr, typeReference, true);
     }
 
+    public <T> T getData(String key, TypeReference<T> typeReference) {
+        Object data = this.get(key);
+        String jsonStr = JSONUtil.toJsonStr(data);
+        return JSONUtil.toBean(jsonStr, typeReference, true);
+    }
+
     public R setFeignData(Object o) {
         return this.put(FeignConstant.FEIGN_RESP_KEY, o);
     }

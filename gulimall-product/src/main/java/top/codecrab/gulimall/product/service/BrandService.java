@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import top.codecrab.common.utils.PageUtils;
 import top.codecrab.gulimall.product.entity.BrandEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,5 +23,7 @@ public interface BrandService extends IService<BrandEntity> {
      * @param brand 品牌
      */
     void updateDetail(BrandEntity brand);
+
+    List<BrandEntity> getBrandsByIds(List<Long> brandIds);
 }
 
