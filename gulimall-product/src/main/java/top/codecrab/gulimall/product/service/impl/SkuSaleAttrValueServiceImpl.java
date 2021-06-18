@@ -9,7 +9,9 @@ import top.codecrab.common.utils.Query;
 import top.codecrab.gulimall.product.dao.SkuSaleAttrValueDao;
 import top.codecrab.gulimall.product.entity.SkuSaleAttrValueEntity;
 import top.codecrab.gulimall.product.service.SkuSaleAttrValueService;
+import top.codecrab.gulimall.product.web.vo.sku.SkuItemSaleAttrVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,6 +31,11 @@ public class SkuSaleAttrValueServiceImpl extends ServiceImpl<SkuSaleAttrValueDao
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<SkuItemSaleAttrVo> getSaleAttrBySpuId(Long spuId) {
+        return baseMapper.getSaleAttrBySpuId(spuId);
     }
 
 }

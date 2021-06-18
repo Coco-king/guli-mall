@@ -3,6 +3,7 @@ package top.codecrab.gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.codecrab.common.utils.PageUtils;
 import top.codecrab.gulimall.product.entity.SkuInfoEntity;
+import top.codecrab.gulimall.product.web.vo.sku.SkuItemVo;
 
 import java.util.Map;
 
@@ -15,5 +16,7 @@ import java.util.Map;
 public interface SkuInfoService extends IService<SkuInfoEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    SkuItemVo item(Long skuId);
 }
 

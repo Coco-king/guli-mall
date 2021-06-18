@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import top.codecrab.common.utils.PageUtils;
 import top.codecrab.gulimall.product.entity.AttrGroupEntity;
 import top.codecrab.gulimall.product.vo.AttrGroupWithAttrsVo;
+import top.codecrab.gulimall.product.web.vo.sku.SkuItemAttrGroupVo;
 
 import java.util.List;
 import java.util.Map;
@@ -21,5 +22,7 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
     PageUtils queryPage(Map<String, Object> params, Long categoryId);
 
     List<AttrGroupWithAttrsVo> getAttrGroupWithAttrByCatelogId(Long catelogId);
+
+    List<SkuItemAttrGroupVo> getAttrGroupWithAttrBySpuId(Long spuId, Long catalogId);
 }
 

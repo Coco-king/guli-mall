@@ -949,7 +949,7 @@
                     <li>
                       <a href="#" title="vivo X9s 全网通 4GB+64GB 磨砂黑 移动联通电信4G手机 双卡双待">
                         <img src="/static/search/img/593ba628n8794c6a6.jpg"
-                              alt=""></a>
+                             alt=""></a>
                       <a href="#" title="【预约版】华为 HUAWEI 畅享7S 全面屏双摄 4GB +64GB 黑色 移动联通电信4G手机 双卡双待">
                         <em>vivo Xplay6 全网通 6GB+64GB 磨砂黑 移动联通电信4G手机 双卡双待</em>
                       </a>
@@ -1209,13 +1209,14 @@
                     <a href="#">关注</a>
                   </div>
                   <p class="da">
-                    <a href="#" title="购买获得原厂2年整机保修(含电池)，和多达2次意外损坏的保修服务。购买勾选：保障服务、原厂保2年。">
+                    <a th:href="|http://item.gulimall.com/${p.skuId}.html|"
+                       title="购买获得原厂2年整机保修(含电池)，和多达2次意外损坏的保修服务。购买勾选：保障服务、原厂保2年。">
                       <img th:src="${p.skuImg}" class="dim">
                     </a>
                   </p>
                   <ul class="tab_im">
                     <li>
-                      <a href="#">
+                      <a th:href="|http://item.gulimall.com/${p.skuId}.html|">
                         <img th:src="${p.skuImg}"></a>
                     </li>
                   </ul>
@@ -1223,7 +1224,8 @@
                     <span th:text="${p.skuPrice}">¥5199.00</span>
                   </p>
                   <p class="tab_JE">
-                    <a th:utext="${p.skuTitle}" href="#" title="购买获得原厂2年整机保修(含电池)，和多达2次意外损坏的保修服务。购买勾选：保障服务、原厂保2年。">
+                    <a th:utext="${p.skuTitle}" th:href="|http://item.gulimall.com/${p.skuId}.html|"
+                       title="购买获得原厂2年整机保修(含电池)，和多达2次意外损坏的保修服务。购买勾选：保障服务、原厂保2年。">
                       Apple iPhone 7 Plus (A1661) 32G 黑色 移动联通电信4G手机
                     </a>
                   </p>

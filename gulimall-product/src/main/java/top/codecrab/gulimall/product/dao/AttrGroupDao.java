@@ -2,7 +2,11 @@ package top.codecrab.gulimall.product.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import top.codecrab.gulimall.product.entity.AttrGroupEntity;
+import top.codecrab.gulimall.product.web.vo.sku.SkuItemAttrGroupVo;
+
+import java.util.List;
 
 /**
  * 属性分组
@@ -13,4 +17,5 @@ import top.codecrab.gulimall.product.entity.AttrGroupEntity;
 @Mapper
 public interface AttrGroupDao extends BaseMapper<AttrGroupEntity> {
 
+    List<SkuItemAttrGroupVo> getAttrGroupWithAttrBySkuId(@Param("spuId") Long spuId, @Param("catalogId") Long catalogId);
 }

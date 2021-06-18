@@ -8,6 +8,193 @@ import java.util.concurrent.*;
  */
 public class ThreadTest {
 
+    public static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(10);
+
+    /**
+     * CompletableFuture异步任务编排，和js的Promise类似
+     * <ol>
+     *     <li>使用CompletableFuture传入一个线程池执行</li>
+     *     <p>
+     *         //使用supplyAsync方法可以获得异步执行返回值，阻塞式
+     *         CompletableFuture.runAsync(() -> {
+     *             System.out.println("当前线程ID：" + Thread.currentThread().getId());
+     *             int i = 10 / 5;
+     *             System.out.println(i);
+     *         }, THREAD_POOL);
+     *     </p>
+     * </ol>
+     */
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        System.out.println("main start....");
+
+        /*
+        //任务返回值和异常情况处理返回值分开操作
+        CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+            System.out.println("当前线程ID：" + Thread.currentThread().getId());
+            int i = 10 / 0;
+            System.out.println(i);
+            return i;
+        }, THREAD_POOL).whenComplete((result, exception) -> {
+            //这种方法虽然可以感知异常，但是无法修改返回值，阻塞式
+            System.out.println("异步任务执行完毕。结果：" + result + "\t异常：" + exception);
+        }).exceptionally((throwable -> {
+            //同样可以感知异常，这个方法可以修改返回值，无异常不会进来
+            System.out.println("感知到异常：" + throwable);
+            return 10;
+        }));
+        Integer i = future.get();
+        */
+        /*
+        //同时操作任务返回值和异常返回值
+        CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+            System.out.println("当前线程ID：" + Thread.currentThread().getId());
+            int i = 10 / 2;
+            System.out.println("任务运行结果：" + i);
+            return i;
+        }).handle((res, exe) -> {
+            System.out.println("上一步执行结果：" + res + "\t异常为：" + exe);
+            return res * 2;
+        });
+        Integer i = future.get();
+        */
+
+        /*
+        线程串行化，执行完一个紧接着执行第二个
+        第一种：
+        .thenRunAsync(() -> {
+            System.out.println("第二个任务执行了。线程ID：" + Thread.currentThread().getId());
+        }, THREAD_POOL);
+
+        第二种：
+        .thenAcceptAsync((res) -> {
+            System.out.println("第二个任务执行了。第一步任务结果：" + res + "。线程ID：" + Thread.currentThread().getId());
+        }, THREAD_POOL);
+
+        第三种：
+        .thenApplyAsync(res -> {
+            System.out.println("第三个任务执行了。第二步任务结果：" + res + "。线程ID：" + Thread.currentThread().getId());
+            return "上一步结果修改：" + res;
+        }, THREAD_POOL)
+         */
+        /*
+        CompletableFuture.supplyAsync(() -> {
+            System.out.println("当前线程ID：" + Thread.currentThread().getId());
+            int i = 10 / 2;
+            System.out.println("任务运行结果：" + i);
+            return i;
+        }, THREAD_POOL).thenApplyAsync(res -> {
+            System.out.println("第二个任务执行了。第一步任务结果：" + res + "。线程ID：" + Thread.currentThread().getId());
+            return res * 2;
+        }, THREAD_POOL).thenApplyAsync(res -> {
+            System.out.println("第三个任务执行了。第二步任务结果：" + res + "。线程ID：" + Thread.currentThread().getId());
+            return "上一步结果修改：" + res;
+        }, THREAD_POOL).thenAcceptAsync(res -> {
+            System.out.println("最终效果：" + res);
+        }, THREAD_POOL);
+        */
+        /*
+        //两任务组合都要完成
+        CompletableFuture<Object> future01 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("任务1当前线程ID：" + Thread.currentThread().getId());
+            int i = 10 / 2;
+            try {
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("任务1结束。。。");
+            return i;
+        }, THREAD_POOL);
+
+        CompletableFuture<Object> future02 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("任务2当前线程ID：" + Thread.currentThread().getId());
+            System.out.println("任务2结束。。。");
+            return "Hello";
+        }, THREAD_POOL);
+        */
+        /*
+        //等前两个组合的任务完成，执行第三个任务，无法接收上几步的返回值
+        future01.runAfterBothAsync(future02, () -> {
+            System.out.println("任务三开始了");
+        }, THREAD_POOL);
+        */
+        /*
+        future01.thenAcceptBothAsync(future02, (f1, f2) -> {
+            System.out.println("任务三开始了。第一步返回值：" + f1 + "\t第二步返回值：" + f2);
+        }, THREAD_POOL);
+        */
+        /*
+        CompletableFuture<String> future = future01.thenCombineAsync(future02, (f1, f2) -> {
+            System.out.println("任务三开始了。第一步返回值：" + f1 + "\t第二步返回值：" + f2);
+            return "第三步处理了返回值：" + f1 + ":" + f2;
+        }, THREAD_POOL);
+        System.out.println(future.get());
+        */
+        /*
+        //两个任务组合，只要有一个完成就执行第三个任务，任务返回参数最好有共同的接口或父类，否则程序因为不确定是哪一个任务先执行完毕，无法确定返回值是什么而编译期报错
+        future01.runAfterEitherAsync(future02, () -> {
+            System.out.println("第三个任务执行");
+        }, THREAD_POOL);
+        */
+        /*
+        future01.acceptEitherAsync(future02, res -> {
+            System.out.println("第三个任务执行，上一步结果：" + res);
+        }, THREAD_POOL);
+        */
+        /*
+        //R apply(T t);
+        CompletableFuture<String> future = future01.applyToEitherAsync(future02, res -> {
+            System.out.println("第三个任务执行，上一步结果：" + res);
+            return "第三个任务拼接返回值：" + res;
+        }, THREAD_POOL);
+        System.out.println(future.get());
+        */
+
+        CompletableFuture<String> futureAttr = CompletableFuture.supplyAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(3);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("查询商品属性完成");
+            return "8GB+256GB";
+        }, THREAD_POOL);
+
+        CompletableFuture<String> futureImg = CompletableFuture.supplyAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("查询商品图片完成");
+            return "xiaomi.jpg";
+        }, THREAD_POOL);
+
+        CompletableFuture<String> futureDesc = CompletableFuture.supplyAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("查询商品摘要完成");
+            return "小米的手机";
+        }, THREAD_POOL);
+
+        //CompletableFuture<Void> allOf = CompletableFuture.allOf(futureAttr, futureImg, futureDesc);
+        CompletableFuture<Object> anyOf = CompletableFuture.anyOf(futureAttr, futureImg, futureDesc);
+        long l = System.currentTimeMillis();
+        //阻塞，等待包含的线程全部执行完毕
+        //allOf.get();
+        //阻塞，其中有一个线程完成任务就开始下一个
+        Object o = anyOf.get();
+        System.out.println("执行耗时：" + (System.currentTimeMillis() - l) + "ms");
+        //此时直接调用其他任务的get方法就不会被阻塞，因为都已经完成执行拿到值了
+        //System.out.println("结果：" + futureAttr.get() + "=>" + futureImg.get() + "=>" + futureDesc.get());
+        System.out.println("结果：" + o);
+
+        System.out.println("main end....");
+    }
+
     /**
      * 开启线程的4种方式：
      * <ol>
@@ -35,6 +222,7 @@ public class ThreadTest {
      *     </ul>
      *     <b style="color:red">以上三种均不推荐使用，因为当有大并发时，频繁的new Thread会导致内存耗尽，推荐使用线程池</b>
      *     <li style="color:green">推荐：使用线程池创建。最简单用法：Executors.newFixedThreadPool(5).execute(new Runnable01());</li>
+     *     <li style="color:green">推荐：创建一个全局的线程池，每个项目一两个就够了</li>
      *     <p></p>
      *     <b style="color:rgb(187, 54, 131)">
      *         总结：
@@ -46,7 +234,7 @@ public class ThreadTest {
      *     </b>
      * </ol>
      */
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
+    public void thread() {
         System.out.println("main start....");
 
         //创建5个线程的线程池，核心线程5个，最大5个

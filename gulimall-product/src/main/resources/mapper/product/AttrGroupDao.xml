@@ -3,7 +3,7 @@
 
 <mapper namespace="top.codecrab.gulimall.product.dao.AttrGroupDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="top.codecrab.gulimall.product.entity.AttrGroupEntity" id="attrGroupMap">
         <result property="attrGroupId" column="attr_group_id"/>
         <result property="attrGroupName" column="attr_group_name"/>
@@ -12,5 +12,27 @@
         <result property="icon" column="icon"/>
         <result property="catelogId" column="catelog_id"/>
     </resultMap>
+
+    <resultMap id="skuItemAttrGroupVo" type="top.codecrab.gulimall.product.web.vo.sku.SkuItemAttrGroupVo">
+        <result column="attr_group_name" property="groupName"/>
+        <collection property="baseAttrVos" ofType="top.codecrab.gulimall.product.web.vo.sku.SkuItemBaseAttrVo">
+            <result column="attr_name" property="attrName"/>
+            <result column="attr_value" property="attrValue"/>
+            <result column="show_desc" property="showDesc"/>
+        </collection>
+    </resultMap>
+
+    <select id="getAttrGroupWithAttrBySkuId" resultMap="skuItemAttrGroupVo">
+        SELECT ag.attr_group_name,
+               a.attr_name,
+               a.show_desc,
+               pav.attr_value
+        FROM pms_attr_group ag
+                 LEFT JOIN pms_attr_attrgroup_relation aar ON ag.attr_group_id = aar.attr_group_id
+                 LEFT JOIN pms_attr a ON aar.attr_id = a.attr_id
+                 LEFT JOIN pms_product_attr_value pav ON a.attr_id = pav.attr_id
+        WHERE ag.catelog_id = #{catalogId}
+          AND pav.spu_id = #{spuId}
+    </select>
 
 </mapper>

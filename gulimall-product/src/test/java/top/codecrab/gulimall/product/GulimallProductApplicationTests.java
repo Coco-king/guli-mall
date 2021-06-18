@@ -1,5 +1,6 @@
 package top.codecrab.gulimall.product;
 
+import cn.hutool.json.JSONUtil;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
 import org.redisson.api.RedissonClient;
@@ -7,10 +8,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import top.codecrab.gulimall.product.entity.BrandEntity;
+import top.codecrab.gulimall.product.service.AttrGroupService;
 import top.codecrab.gulimall.product.service.BrandService;
+import top.codecrab.gulimall.product.service.SkuSaleAttrValueService;
+import top.codecrab.gulimall.product.web.vo.sku.SkuItemAttrGroupVo;
+import top.codecrab.gulimall.product.web.vo.sku.SkuItemSaleAttrVo;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @SpringBootTest
 class GulimallProductApplicationTests {
@@ -19,10 +25,25 @@ class GulimallProductApplicationTests {
     private BrandService brandService;
 
     @Resource
+    private AttrGroupService attrGroupService;
+
+    @Resource
+    private SkuSaleAttrValueService skuSaleAttrValueService;
+
+    @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
     @Resource
     private RedissonClient redisson;
+
+    @Test
+    void testSkuItem() {
+        List<SkuItemAttrGroupVo> list = attrGroupService.getAttrGroupWithAttrBySpuId(3L, 225L);
+        System.out.println(JSONUtil.toJsonStr(list));
+
+        List<SkuItemSaleAttrVo> saleAttrVoList = skuSaleAttrValueService.getSaleAttrBySpuId(3L);
+        System.out.println(JSONUtil.toJsonStr(saleAttrVoList));
+    }
 
     @Test
     void contextLoads() {

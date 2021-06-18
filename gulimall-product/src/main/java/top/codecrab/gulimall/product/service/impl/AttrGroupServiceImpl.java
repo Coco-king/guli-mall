@@ -14,6 +14,7 @@ import top.codecrab.gulimall.product.entity.AttrGroupEntity;
 import top.codecrab.gulimall.product.service.AttrGroupService;
 import top.codecrab.gulimall.product.service.AttrService;
 import top.codecrab.gulimall.product.vo.AttrGroupWithAttrsVo;
+import top.codecrab.gulimall.product.web.vo.sku.SkuItemAttrGroupVo;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -73,6 +74,11 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             vo.setAttrs(attrService.findAttrRelation(vo.getAttrGroupId()));
             return vo;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SkuItemAttrGroupVo> getAttrGroupWithAttrBySpuId(Long spuId, Long catalogId) {
+        return baseMapper.getAttrGroupWithAttrBySkuId(spuId, catalogId);
     }
 
 }
