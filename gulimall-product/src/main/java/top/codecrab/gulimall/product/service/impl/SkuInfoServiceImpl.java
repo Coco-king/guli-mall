@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import top.codecrab.common.response.R;
@@ -31,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
@@ -57,6 +60,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
     @Resource
     private BrandService brandService;
+
+    @Resource
+    private ThreadPoolExecutor executor;
 
     @Resource
     private WareFeignClient wareFeignClient;
@@ -92,55 +98,84 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     }
 
     @Override
+    @SneakyThrows
     public SkuItemVo item(Long skuId) {
-        //查询Sku的信息
-        SkuInfoEntity skuInfoEntity = baseMapper.selectById(skuId);
-        Long spuId = skuInfoEntity.getSpuId();
-        Long catalogId = skuInfoEntity.getCatalogId();
-        //查询Sku对应的图片集合
-        List<SkuImagesEntity> skuImagesEntities = skuImagesService.getSkuImagesBySkuId(skuInfoEntity.getSkuId());
-        //查询指定的Spu介绍
-        SpuInfoDescEntity descEntity = spuInfoDescService.getById(spuId);
-        //查询Spu对应的基本属性信息
-        List<SkuItemAttrGroupVo> itemAttrGroupVos = attrGroupService.getAttrGroupWithAttrBySpuId(spuId, catalogId);
-        //查询Spu包含的所有销售属性
-        List<SkuItemSaleAttrVo> saleAttrVos = skuSaleAttrValueService.getSaleAttrBySpuId(spuId);
-        //查询品牌名
-        BrandEntity brandEntity = brandService.getById(skuInfoEntity.getBrandId());
-
+        //long l = System.currentTimeMillis();
         SkuItemVo skuItemVo = new SkuItemVo();
-        //远程查询库存
-        try {
-            R r = wareFeignClient.hasStock(Collections.singletonList(skuId));
-            if (r.getCode() == 0) {
-                List<SkuHasStockTo> stock = r.getFeignData(new TypeReference<List<SkuHasStockTo>>() {
-                });
-                if (CollectionUtil.isNotEmpty(stock)) {
-                    skuItemVo.setHasStock(stock.get(0).getHasStock());
-                }
-            }
-        } catch (Exception e) {
-            log.error("远程调用 hasStock 失败：skuId：" + skuId, e);
-        }
-        //组装需要快速展示的数据
-        List<SkuItemAttrGroupVo> groupVos = new ArrayList<>();
-        for (SkuItemAttrGroupVo vo : itemAttrGroupVos) {
-            SkuItemAttrGroupVo groupVo = new SkuItemAttrGroupVo();
-            List<SkuItemBaseAttrVo> collect = vo.getBaseAttrVos().stream()
-                    .filter(attr -> attr.getShowDesc() != null && attr.getShowDesc() == 1)
-                    .collect(Collectors.toList());
-            groupVo.setGroupName("");
-            groupVo.setBaseAttrVos(collect);
-            groupVos.add(groupVo);
-        }
 
-        skuItemVo.setShowDesc(groupVos);
-        skuItemVo.setSkuInfo(skuInfoEntity);
-        skuItemVo.setSkuImages(skuImagesEntities);
-        skuItemVo.setDesc(descEntity);
-        skuItemVo.setSaleAttrVos(saleAttrVos);
-        skuItemVo.setGroupVos(itemAttrGroupVos);
-        skuItemVo.setBrandName(brandEntity.getName());
+        //查询Sku的信息
+        CompletableFuture<SkuInfoEntity> skuInfoFuture = CompletableFuture.supplyAsync(() -> {
+            SkuInfoEntity skuInfoEntity = baseMapper.selectById(skuId);
+            skuItemVo.setSkuInfo(skuInfoEntity);
+            return skuInfoEntity;
+        }, executor);
+
+        //查询Spu对应的基本属性信息
+        CompletableFuture<List<SkuItemAttrGroupVo>> groupVosFuture = skuInfoFuture.thenApplyAsync(res -> {
+            List<SkuItemAttrGroupVo> itemAttrGroupVos = attrGroupService.getAttrGroupWithAttrBySpuId(res.getSpuId(), res.getCatalogId());
+            skuItemVo.setGroupVos(itemAttrGroupVos);
+            return itemAttrGroupVos;
+        }, executor);
+
+        //组装需要快速展示的数据
+        CompletableFuture<Void> showDescFuture = groupVosFuture.thenAcceptAsync(res -> {
+            List<SkuItemAttrGroupVo> groupVos = new ArrayList<>();
+            for (SkuItemAttrGroupVo vo : res) {
+                SkuItemAttrGroupVo groupVo = new SkuItemAttrGroupVo();
+                List<SkuItemBaseAttrVo> collect = vo.getBaseAttrVos().stream()
+                        .filter(attr -> attr.getShowDesc() != null && attr.getShowDesc() == 1)
+                        .collect(Collectors.toList());
+                groupVo.setGroupName("");
+                groupVo.setBaseAttrVos(collect);
+                groupVos.add(groupVo);
+            }
+            skuItemVo.setShowDesc(groupVos);
+        }, executor);
+
+        //查询指定的Spu介绍
+        CompletableFuture<Void> spuInfoFuture = skuInfoFuture.thenAcceptAsync(res -> {
+            SpuInfoDescEntity descEntity = spuInfoDescService.getById(res.getSpuId());
+            skuItemVo.setDesc(descEntity);
+        }, executor);
+
+        //查询Spu包含的所有销售属性
+        CompletableFuture<Void> saleAttrFuture = skuInfoFuture.thenAcceptAsync(res -> {
+            List<SkuItemSaleAttrVo> saleAttrVos = skuSaleAttrValueService.getSaleAttrBySpuId(res.getSpuId());
+            skuItemVo.setSaleAttrVos(saleAttrVos);
+        }, executor);
+
+        //查询品牌名
+        CompletableFuture<Void> brandFuture = skuInfoFuture.thenAcceptAsync(res -> {
+            BrandEntity brandEntity = brandService.getById(res.getBrandId());
+            skuItemVo.setBrandName(brandEntity.getName());
+        }, executor);
+
+        //远程查询库存
+        CompletableFuture<Void> skuHasStockFuture = CompletableFuture.runAsync(() -> {
+            try {
+                R r = wareFeignClient.hasStock(Collections.singletonList(skuId));
+                if (r.getCode() == 0) {
+                    List<SkuHasStockTo> stock = r.getFeignData(new TypeReference<List<SkuHasStockTo>>() {
+                    });
+                    if (CollectionUtil.isNotEmpty(stock)) {
+                        skuItemVo.setHasStock(stock.get(0).getHasStock());
+                    }
+                }
+            } catch (Exception e) {
+                log.error("远程调用 hasStock 失败：skuId：" + skuId, e);
+            }
+        }, executor);
+
+        //查询Sku对应的图片集合
+        CompletableFuture<Void> skuImagesFuture = CompletableFuture.runAsync(() -> {
+            List<SkuImagesEntity> skuImagesEntities = skuImagesService.getSkuImagesBySkuId(skuId);
+            skuItemVo.setSkuImages(skuImagesEntities);
+        }, executor);
+
+        CompletableFuture.allOf(showDescFuture, spuInfoFuture, saleAttrFuture, brandFuture, skuHasStockFuture, skuImagesFuture).get();
+
+        //未使用异步编排第一次访问：826ms，非第一次：22; 使用异步编排：590ms，非第一次：11
+        //System.out.println(System.currentTimeMillis() - l);
         return skuItemVo;
     }
 }

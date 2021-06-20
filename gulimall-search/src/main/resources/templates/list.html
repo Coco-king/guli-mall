@@ -1070,7 +1070,6 @@
                      sort="skuPrice" href="#">价格 [[${(!#strings.isEmpty(s) && #strings.startsWith(s,'skuPrice') &&
                     #strings.endsWith(s,'desc'))?'↓':(!#strings.isEmpty(s) &&
                     #strings.contains(s,'skuPrice')?'↑':'')}]]</a>
-
                   &nbsp;&nbsp;&nbsp;&nbsp;
                   价格区间：<input id="priceFrom" type="number" style="width: 80px"
                               th:value="${#strings.isEmpty(p)?'':#strings.substringBefore(p,'_')}"> -
@@ -1221,7 +1220,7 @@
                     </li>
                   </ul>
                   <p class="tab_R">
-                    <span th:text="${p.skuPrice}">¥5199.00</span>
+                    <span th:text="${#numbers.formatDecimal(p.skuPrice,1,2)}">¥5199.00</span>
                   </p>
                   <p class="tab_JE">
                     <a th:utext="${p.skuTitle}" th:href="|http://item.gulimall.com/${p.skuId}.html|"

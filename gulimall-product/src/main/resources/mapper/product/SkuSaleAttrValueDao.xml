@@ -13,15 +13,26 @@
         <result property="attrSort" column="attr_sort"/>
     </resultMap>
 
-    <select id="getSaleAttrBySpuId" resultType="top.codecrab.gulimall.product.web.vo.sku.SkuItemSaleAttrVo">
-        SELECT ssav.attr_id attr_id,
-               ssav.attr_name attr_name,
-               GROUP_CONCAT(DISTINCT ssav.attr_value) attr_values
+    <resultMap id="skuItemSaleAttrVo" type="top.codecrab.gulimall.product.web.vo.sku.SkuItemSaleAttrVo">
+        <result property="attrId" column="attr_id"/>
+        <result property="attrName" column="attr_name"/>
+        <collection property="attrValues" ofType="top.codecrab.gulimall.product.web.vo.sku.AttrValueWithSkuIds">
+            <result property="attrValue" column="attr_value"/>
+            <result property="skuIds" column="sku_ids"/>
+        </collection>
+    </resultMap>
+
+    <select id="getSaleAttrBySpuId" resultMap="skuItemSaleAttrVo">
+        SELECT ssav.attr_id                      attr_id,
+               ssav.attr_name                    attr_name,
+               ssav.attr_value                   attr_value,
+               GROUP_CONCAT(DISTINCT si.sku_id ) sku_ids
         FROM pms_sku_info si
                  LEFT JOIN pms_sku_sale_attr_value ssav ON si.sku_id = ssav.sku_id
         WHERE spu_id = #{spuId}
         GROUP BY ssav.attr_id,
-                 ssav.attr_name
+                 ssav.attr_name,
+                 ssav.attr_value
     </select>
 
 </mapper>

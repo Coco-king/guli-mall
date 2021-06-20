@@ -603,8 +603,12 @@
               <div class="box-attr-2 clear" th:each="attr:${item.saleAttrVos}">
                 <dl>
                   <dt th:text="${attr.attrName}">选择内存</dt>
-                  <dd th:each="val:${#strings.listSplit(attr.attrValues,',')}">
-                    <a href="#" th:text="${val}">128GB</a>
+                  <dd th:each="vals:${attr.attrValues}">
+                    <a href="JavaScript:void(0)"
+                       th:class="${#lists.contains(#strings.listSplit(vals.skuIds,','),item.skuInfo.skuId.toString()) ? 'sku_attr_value checked':'sku_attr_value'}"
+                       th:text="${vals.attrValue}"
+                       th:attr="skus=${vals.skuIds}"
+                    >128GB</a>
                   </dd>
                 </dl>
               </div>
@@ -1556,6 +1560,28 @@
   <script src="/static/item/js/jquery1.9.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/item/js/js.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
+    $(".sku_attr_value").click(function () {
+      const skus = []
+      const curr = $(this).addClass("clicked").attr("skus").split(",")
+      skus.push(curr)
+
+      $(this).parent().parent().find('.sku_attr_value').removeClass('checked')
+
+      $("a[class='sku_attr_value checked']").each(function () {
+        skus.push($(this).attr('skus').split(","))
+      })
+
+      let filter = skus[0]
+      for (let i = 1; i < skus.length; i++) {
+        filter = $(filter).filter(skus[i])
+      }
+      location.href = `http://item.gulimall.com/${filter[0]}.html`
+    })
+
+    $(function () {
+      $("a[class='sku_attr_value']").parent().removeClass('redborder')
+      $("a[class='sku_attr_value checked']").parent().addClass('redborder')
+    })
   </script>
 
 </html>
