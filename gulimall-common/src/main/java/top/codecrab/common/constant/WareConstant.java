@@ -3,11 +3,11 @@ package top.codecrab.common.constant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-public class WareConstant {
+public interface WareConstant {
 
     @Getter
     @AllArgsConstructor
-    public enum PurchaseStatusEnum {
+    enum PurchaseStatusEnum {
         CREATED(0, "新建"),
         ASSIGNED(1, "已分配"),
         RECEIVE(2, "已领取"),
@@ -20,7 +20,7 @@ public class WareConstant {
 
     @Getter
     @AllArgsConstructor
-    public enum PurchaseDetailStatusEnum {
+    enum PurchaseDetailStatusEnum {
         CREATED(0, "新建"),
         ASSIGNED(1, "已分配"),
         BUYING(2, "正在采购"),

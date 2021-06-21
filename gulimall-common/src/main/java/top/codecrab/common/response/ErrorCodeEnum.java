@@ -15,6 +15,7 @@ import lombok.Getter;
  * &emsp;&emsp;12: 订单<br>
  * &emsp;&emsp;13: 购物车<br>
  * &emsp;&emsp;14: 物流<br>
+ * &emsp;&emsp;15: 会员<br>
  *
  * @author codecrab
  * @since 2021年04月23日 8:53
@@ -39,9 +40,13 @@ public enum ErrorCodeEnum {
      * 参数校验
      */
     VALID_EXCEPTION(10001, "参数格式校验失败"),
+    PHONE_IS_NOT_LEGAL(10003, "手机号码格式不合法"),
     VALID_NOT_ALL_NULL_EXCEPTION(10102, "更新的参数不能全部为空"),
     CATEGORY_NAME_NULL_ERROR(10203, "商品分类名称不能为空"),
     REMOVE_FILE_URL_NULL_ERROR(10304, "删除的图片路径不能为空"),
+    PHONE_IS_EXIST(15100, "手机号码已被注册"),
+    USERNAME_IS_EXIST(15101, "用户名已被注册"),
+    USERNAME_OR_PASSWORD_ERROR(15102, "用户名或密码错误"),
 
     PRODUCT_UP_ERROR(11000, "商品上架异常"),
 
@@ -57,7 +62,8 @@ public enum ErrorCodeEnum {
     /**
      * 业务限流
      */
-    ALIYUN_SMS_LIMIT_CONTROL_ERROR(-502, "短信发送过于频繁");
+    ALIYUN_SMS_LIMIT_CONTROL_ERROR(10002, "短信发送过于频繁"),
+    ;
 
     private final Integer code;
 

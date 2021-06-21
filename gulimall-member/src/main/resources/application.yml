@@ -19,3 +19,6 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
+gulimall:
+  member:
+    default-avatar: https://pic.imgdb.cn/item/60437b7e360785be54b9e5a5.jpg

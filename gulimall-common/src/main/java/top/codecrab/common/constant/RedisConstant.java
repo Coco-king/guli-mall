@@ -22,4 +22,8 @@ public interface RedisConstant {
         String TYPE = "catalogJson";
         String KEY = PREFIX + TYPE;
     }
+
+    interface Auth {
+        String CODE = PREFIX + "sms:code:";
+    }
 }

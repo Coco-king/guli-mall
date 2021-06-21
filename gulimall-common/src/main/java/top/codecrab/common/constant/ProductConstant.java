@@ -7,13 +7,13 @@ import lombok.Getter;
  * @author codecrab
  * @since 2021年06月05日 15:51
  */
-public class ProductConstant {
+public interface ProductConstant {
 
-    public static final String MODEL_NAME = "product";
+    String MODEL_NAME = "product";
 
     @Getter
     @AllArgsConstructor
-    public enum AttrEnum {
+    enum AttrEnum {
         ATTR_SALE(0, "销售类型"),
         ATTR_BASE(1, "基本类型");
 
@@ -23,7 +23,7 @@ public class ProductConstant {
 
     @Getter
     @AllArgsConstructor
-    public enum StatusEnum {
+    enum StatusEnum {
         NEW_SPU(0, "商品新建"),
         SPU_UP(1, "商品上架"),
         SPU_DOWN(2, "商品下架");

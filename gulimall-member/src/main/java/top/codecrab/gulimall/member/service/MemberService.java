@@ -3,6 +3,10 @@ package top.codecrab.gulimall.member.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.codecrab.common.utils.PageUtils;
 import top.codecrab.gulimall.member.entity.MemberEntity;
+import top.codecrab.gulimall.member.exception.PhoneExistException;
+import top.codecrab.gulimall.member.exception.UsernameExistException;
+import top.codecrab.gulimall.member.vo.MemberLoginVo;
+import top.codecrab.gulimall.member.vo.MemberRegisterVo;
 
 import java.util.Map;
 
@@ -15,5 +19,13 @@ import java.util.Map;
 public interface MemberService extends IService<MemberEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void register(MemberRegisterVo vo);
+
+    void checkUsernameIsExist(String username) throws UsernameExistException;
+
+    void checkPhoneIsExist(String phone) throws PhoneExistException;
+
+    MemberEntity login(MemberLoginVo vo);
 }
 

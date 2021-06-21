@@ -74,6 +74,10 @@ public class R extends HashMap<String, Object> {
         return (Integer) this.get("code");
     }
 
+    public String getMsg() {
+        return (String) this.get("msg");
+    }
+
     public Object getFeignData() {
         return this.get(FeignConstant.FEIGN_RESP_KEY);
     }

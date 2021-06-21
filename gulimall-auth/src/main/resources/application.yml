@@ -1,0 +1,25 @@
+server:
+  port: 20000
+spring:
+  application:
+    name: gulimall-auth
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        group: dev
+        namespace: 999f941b-0bbf-4574-b1f9-e24ff6e341ab
+  redis:
+    host: 192.168.66.230
+    port: 6379
+  thymeleaf:
+    cache: false
+    check-template: true
+    check-template-location: true
+    enabled: true
+    encoding: UTF-8
+    excluded-view-names:
+    mode: HTML
+    prefix: classpath:/templates/
+    suffix: .html
+
