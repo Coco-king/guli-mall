@@ -12,6 +12,7 @@ import top.codecrab.gulimall.member.exception.UsernameExistException;
 import top.codecrab.gulimall.member.service.MemberService;
 import top.codecrab.gulimall.member.vo.MemberLoginVo;
 import top.codecrab.gulimall.member.vo.MemberRegisterVo;
+import top.codecrab.gulimall.member.vo.SocialUserVo;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -85,6 +86,15 @@ public class MemberController {
             return R.error(ErrorCodeEnum.USERNAME_OR_PASSWORD_ERROR);
         }
         return R.ok();
+    }
+
+    @PostMapping("/oauth2/login")
+    public R oauth2Login(@RequestBody SocialUserVo socialUser) {
+        MemberEntity memberEntity = memberService.login(socialUser);
+        if (memberEntity == null) {
+            return R.error(ErrorCodeEnum.USERNAME_OR_PASSWORD_ERROR);
+        }
+        return R.ok().setFeignData(memberEntity);
     }
 
     /**

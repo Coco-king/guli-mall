@@ -24,6 +24,8 @@ spring:
     redis:
       key-prefix: gulimall:CACHE_
       time-to-live: 3600000
+  session:
+    store-type: redis
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
   global-config:

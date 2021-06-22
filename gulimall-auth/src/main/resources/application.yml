@@ -22,4 +22,15 @@ spring:
     mode: HTML
     prefix: classpath:/templates/
     suffix: .html
-
+  session:
+    store-type: redis
+gulimall:
+  oauth2:
+    weibo:
+      client-id: 3785190116
+      client-secret: c5d32b872fde32992a3b4bfeff2e0e00
+      grant-type: authorization_code
+    qq:
+      client-id: 3785190116
+      client-secret: c5d32b872fde32992a3b4bfeff2e0e00
+      grant-type: authorization_code

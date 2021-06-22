@@ -1,7 +1,5 @@
-package top.codecrab.gulimall.member.entity;
+package top.codecrab.common.vo;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -15,15 +13,10 @@ import java.time.LocalDateTime;
  * @date 2021-05-28 22:40:42
  */
 @Data
-@TableName("ums_member")
-public class MemberEntity implements Serializable {
+public class MemberRespVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * id
-     */
-    @TableId
     private Long id;
 
     /**

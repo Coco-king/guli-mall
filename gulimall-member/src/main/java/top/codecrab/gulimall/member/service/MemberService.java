@@ -7,6 +7,7 @@ import top.codecrab.gulimall.member.exception.PhoneExistException;
 import top.codecrab.gulimall.member.exception.UsernameExistException;
 import top.codecrab.gulimall.member.vo.MemberLoginVo;
 import top.codecrab.gulimall.member.vo.MemberRegisterVo;
+import top.codecrab.gulimall.member.vo.SocialUserVo;
 
 import java.util.Map;
 
@@ -27,5 +28,7 @@ public interface MemberService extends IService<MemberEntity> {
     void checkPhoneIsExist(String phone) throws PhoneExistException;
 
     MemberEntity login(MemberLoginVo vo);
+
+    MemberEntity login(SocialUserVo socialUser);
 }
 

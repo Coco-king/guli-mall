@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import top.codecrab.common.response.R;
 import top.codecrab.gulimall.auth.vo.LoginVo;
 import top.codecrab.gulimall.auth.vo.RegisterVo;
+import top.codecrab.gulimall.auth.vo.SocialUserVo;
 
 /**
  * @author codecrab
@@ -19,4 +20,7 @@ public interface MemberFeignClient {
 
     @PostMapping("/member/member/login")
     R login(@RequestBody LoginVo vo);
+
+    @PostMapping("/member/member/oauth2/login")
+    R oauth2Login(@RequestBody SocialUserVo socialUser);
 }
