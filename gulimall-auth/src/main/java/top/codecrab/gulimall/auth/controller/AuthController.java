@@ -1,5 +1,6 @@
 package top.codecrab.gulimall.auth.controller;
 
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.PhoneUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -18,12 +19,14 @@ import top.codecrab.common.constant.RedisConstant;
 import top.codecrab.common.constant.ThirdPartyConstant;
 import top.codecrab.common.response.ErrorCodeEnum;
 import top.codecrab.common.response.R;
+import top.codecrab.common.vo.MemberRespVo;
 import top.codecrab.gulimall.auth.client.MemberFeignClient;
 import top.codecrab.gulimall.auth.client.ThirdPartyFeignClient;
 import top.codecrab.gulimall.auth.vo.LoginVo;
 import top.codecrab.gulimall.auth.vo.RegisterVo;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,8 +79,6 @@ public class AuthController {
     }
 
     /**
-     * TODO 分布式session实现
-     *
      * @param attributes 重定向可以携带数据，实现原理是 session
      */
     @PostMapping("/register")
@@ -132,11 +133,13 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(LoginVo vo, RedirectAttributes attributes) {
+    public String login(LoginVo vo, RedirectAttributes attributes, HttpSession session) {
         try {
             R r = memberFeignClient.login(vo);
             if (r.getCode() == 0) {
-                //TODO 登陆成功
+                MemberRespVo data = r.getFeignData(new TypeReference<MemberRespVo>() {
+                });
+                session.setAttribute(RedisConstant.Auth.SESSION_LOGIN_USER, data);
                 return "redirect:http://www.gulimall.com";
             }
             attributes.addFlashAttribute("errors", MapUtil.of("errorMsg", r.getMsg()));
@@ -146,5 +149,13 @@ public class AuthController {
             attributes.addFlashAttribute("errors", MapUtil.of("errorMsg", "服务器未知异常"));
             return "redirect:http://auth.gulimall.com/login.html";
         }
+    }
+
+    @GetMapping("/login.html")
+    public String loginPage(HttpSession session) {
+        if (session.getAttribute(RedisConstant.Auth.SESSION_LOGIN_USER) != null) {
+            return "redirect:http://www.gulimall.com";
+        }
+        return "login";
     }
 }

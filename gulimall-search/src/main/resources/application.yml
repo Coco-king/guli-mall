@@ -11,6 +11,11 @@ spring:
         namespace: 999f941b-0bbf-4574-b1f9-e24ff6e341ab
   thymeleaf:
     cache: false
+  session:
+    store-type: redis
+  redis:
+    host: 192.168.66.230
+    port: 6379
 logging:
   level:
     top.codecrab.gulimall: debug

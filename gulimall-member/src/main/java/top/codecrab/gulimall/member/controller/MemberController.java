@@ -85,7 +85,7 @@ public class MemberController {
         if (memberEntity == null) {
             return R.error(ErrorCodeEnum.USERNAME_OR_PASSWORD_ERROR);
         }
-        return R.ok();
+        return R.ok().setFeignData(memberEntity);
     }
 
     @PostMapping("/oauth2/login")

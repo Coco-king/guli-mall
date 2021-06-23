@@ -66,15 +66,16 @@
           </div>
         </b>
         <ul>
-          <li>
-            <a href="#" class="li_2">你好，请登录</a>
+          <li style="border: 0;width: 120px;">
+            <a href="http://auth.gulimall.com/login.html" th:if="${session.loginUser==null}">你好，请登录</a>
+            <a href="JavaScript:void(0)" th:if="${session.loginUser!=null}">你好，[[${session.loginUser.nickname}]]</a>
           </li>
-          <li>
-            <a href="#">免费注册</a>
+          <li th:if="${session.loginUser==null}">
+            <a style="color: red;" href="http://auth.gulimall.com/reg.html" class="li_2">免费注册</a>
           </li>
-          <span>|</span>
-          <li>
-            <a href="#">我的订单</a>
+          <span th:if="${session.loginUser!=null}">|</span>
+          <li th:if="${session.loginUser!=null}">
+            <a href="javascript:;" class="aa">我的订单</a>
           </li>
           <span>|</span>
           <li class="header_wdjd" style="width:80px;">
