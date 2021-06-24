@@ -9,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import top.codecrab.common.constant.AuthConstant;
 import top.codecrab.common.constant.OAuth2Constant;
-import top.codecrab.common.constant.RedisConstant;
 import top.codecrab.common.response.R;
 import top.codecrab.common.vo.MemberRespVo;
 import top.codecrab.gulimall.auth.client.MemberFeignClient;
@@ -56,7 +56,7 @@ public class OAuth2Controller {
                     R r = memberFeignClient.oauth2Login(socialUser);
                     MemberRespVo data = r.getFeignData(new TypeReference<MemberRespVo>() {
                     });
-                    session.setAttribute(RedisConstant.Auth.SESSION_LOGIN_USER, data);
+                    session.setAttribute(AuthConstant.SESSION_LOGIN_USER, data);
                     return "redirect:http://www.gulimall.com";
                 } catch (Exception e) {
                     log.error("远程调用 memberFeignClient.oauth2Login 失败", e);

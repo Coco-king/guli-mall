@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import top.codecrab.common.constant.RedisConstant;
+import top.codecrab.common.constant.AuthConstant;
 import top.codecrab.common.constant.ThirdPartyConstant;
 import top.codecrab.common.response.ErrorCodeEnum;
 import top.codecrab.common.response.R;
@@ -57,7 +57,7 @@ public class AuthController {
             return R.error(ErrorCodeEnum.PHONE_IS_NOT_LEGAL);
         }
 
-        BoundValueOperations<String, Object> ops = redisTemplate.boundValueOps(RedisConstant.Auth.CODE + phone);
+        BoundValueOperations<String, Object> ops = redisTemplate.boundValueOps(AuthConstant.CODE + phone);
 
         Object o = ops.get();
         if (o != null) {
@@ -98,7 +98,7 @@ public class AuthController {
             return "redirect:http://auth.gulimall.com/reg.html";
         }
 
-        BoundValueOperations<String, Object> ops = redisTemplate.boundValueOps(RedisConstant.Auth.CODE + vo.getPhone());
+        BoundValueOperations<String, Object> ops = redisTemplate.boundValueOps(AuthConstant.CODE + vo.getPhone());
         Object o = ops.get();
         //value格式：验证码_时间戳
         if (o == null || !vo.getCode().equals(o.toString().split("_")[0])) {
@@ -114,7 +114,7 @@ public class AuthController {
         //远程调用会员服务，注册用户
         try {
             //删除redis的验证码，令牌机制
-            redisTemplate.delete(RedisConstant.Auth.CODE + vo.getPhone());
+            redisTemplate.delete(AuthConstant.CODE + vo.getPhone());
 
             R r = memberFeignClient.register(vo);
             if (r.getCode() == 0) {
@@ -139,7 +139,7 @@ public class AuthController {
             if (r.getCode() == 0) {
                 MemberRespVo data = r.getFeignData(new TypeReference<MemberRespVo>() {
                 });
-                session.setAttribute(RedisConstant.Auth.SESSION_LOGIN_USER, data);
+                session.setAttribute(AuthConstant.SESSION_LOGIN_USER, data);
                 return "redirect:http://www.gulimall.com";
             }
             attributes.addFlashAttribute("errors", MapUtil.of("errorMsg", r.getMsg()));
@@ -153,7 +153,7 @@ public class AuthController {
 
     @GetMapping("/login.html")
     public String loginPage(HttpSession session) {
-        if (session.getAttribute(RedisConstant.Auth.SESSION_LOGIN_USER) != null) {
+        if (session.getAttribute(AuthConstant.SESSION_LOGIN_USER) != null) {
             return "redirect:http://www.gulimall.com";
         }
         return "login";

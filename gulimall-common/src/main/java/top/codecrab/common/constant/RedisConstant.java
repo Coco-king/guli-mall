@@ -24,7 +24,5 @@ public interface RedisConstant {
     }
 
     interface Auth {
-        String CODE = PREFIX + "sms:code:";
-        String SESSION_LOGIN_USER = "loginUser";
     }
 }

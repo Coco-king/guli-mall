@@ -8,6 +8,7 @@ import top.codecrab.gulimall.product.service.SkuSaleAttrValueService;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,6 +23,12 @@ public class SkuSaleAttrValueController {
 
     @Resource
     private SkuSaleAttrValueService skuSaleAttrValueService;
+
+    @GetMapping("/list/{skuId}")
+    public R listBySkuId(@PathVariable("skuId") Long skuId) {
+        List<String> values = skuSaleAttrValueService.getListBySkuId(skuId);
+        return R.ok().setFeignData(values);
+    }
 
     /**
      * 列表
