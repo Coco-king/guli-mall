@@ -12,13 +12,16 @@ import top.codecrab.gulimall.cart.interceptor.CartInterceptor;
 import top.codecrab.gulimall.cart.service.CartService;
 import top.codecrab.gulimall.cart.to.UserInfoTo;
 import top.codecrab.gulimall.cart.vo.CartItemVo;
+import top.codecrab.gulimall.cart.vo.CartVo;
 import top.codecrab.gulimall.cart.vo.SkuInfoVo;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 /**
  * @author codecrab
@@ -38,7 +41,7 @@ public class CartServiceImpl implements CartService {
     private RedisTemplate<String, Object> redisTemplate;
 
     @Override
-    public CartItemVo getCartItemBySkuId(Long skuId, Integer num) throws ExecutionException, InterruptedException {
+    public CartItemVo addSkuToCart(Long skuId, Integer num) throws ExecutionException, InterruptedException {
 
         BoundHashOperations<String, Object, Object> redisOps = getCartRedisOps();
 
@@ -82,11 +85,88 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartItemVo getCartItemByRedis(Long skuId) {
-        Object o = getCartRedisOps().get(skuId.toString());
-        if (o == null) {
-            return new CartItemVo();
+        return (CartItemVo) getCartRedisOps().get(skuId.toString());
+    }
+
+    @Override
+    public CartVo getCart() throws ExecutionException, InterruptedException {
+        String key = "";
+        CartVo cartVo = new CartVo();
+
+        UserInfoTo info = CartInterceptor.THREAD_LOCAL.get();
+        key = CartConstant.CART_ITEM_PREFIX + info.getUserKey();
+        List<CartItemVo> cartItems = getCartItems(key);
+        if (info.getUserId() != null) {
+            if (cartItems != null) {
+                //如果用户登录就把临时购物车添加到用户购物车
+                for (CartItemVo cartItemVo : cartItems) {
+                    addSkuToCart(cartItemVo.getSkuId(), cartItemVo.getCount());
+                }
+
+                //清除临时购物车
+                List<String> skuIds = cartItems.stream()
+                        .map(cartItemVo -> cartItemVo.getSkuId().toString())
+                        .collect(Collectors.toList());
+                clearCart(skuIds, CartConstant.CART_ITEM_PREFIX + info.getUserKey());
+            }
+
+            //获取已登录用户的购物车
+            key = CartConstant.CART_ITEM_PREFIX + info.getUserId();
+            List<CartItemVo> list = getCartItems(key);
+            cartVo.setItems(list);
+        } else {
+            //未登录
+            cartVo.setItems(cartItems);
         }
-        return (CartItemVo) o;
+
+        BigDecimal total = BigDecimal.ZERO;
+        for (CartItemVo item : cartVo.getItems()) {
+            total = total.add(item.getTotalPrice());
+        }
+
+        cartVo.setTotalAmount(total);
+        return cartVo;
+    }
+
+    @Override
+    public void checkItem(Long skuId, Boolean check) {
+        CartItemVo itemVo = getCartItemByRedis(skuId);
+        if (itemVo != null) {
+            itemVo.setCheck(check);
+            getCartRedisOps().put(skuId.toString(), itemVo);
+        }
+    }
+
+    @Override
+    public void changCount(Long skuId, Integer num) {
+        CartItemVo vo = getCartItemByRedis(skuId);
+        if (vo != null) {
+            vo.setCount(num);
+            getCartRedisOps().put(skuId.toString(), vo);
+        }
+    }
+
+    @Override
+    public void removeItem(Long skuId) {
+        getCartRedisOps().delete(skuId.toString());
+    }
+
+    private void clearCart(List<String> skuIds, String key) {
+        BoundHashOperations<String, Object, Object> ops = redisTemplate.boundHashOps(key);
+        for (String skuId : skuIds) {
+            ops.delete(skuId);
+        }
+    }
+
+    private List<CartItemVo> getCartItems(String key) {
+        BoundHashOperations<String, Object, Object> ops = redisTemplate.boundHashOps(key);
+        List<Object> values = ops.values();
+        if (values != null && !values.isEmpty()) {
+            return values.stream()
+                    .map(o -> (CartItemVo) o)
+                    .collect(Collectors.toList());
+        }
+        return null;
     }
 
     private BoundHashOperations<String, Object, Object> getCartRedisOps() {

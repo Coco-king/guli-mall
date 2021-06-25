@@ -5,10 +5,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import top.codecrab.gulimall.cart.interceptor.CartInterceptor;
 import top.codecrab.gulimall.cart.service.CartService;
-import top.codecrab.gulimall.cart.to.UserInfoTo;
 import top.codecrab.gulimall.cart.vo.CartItemVo;
+import top.codecrab.gulimall.cart.vo.CartVo;
 
 import javax.annotation.Resource;
 import java.util.concurrent.ExecutionException;
@@ -24,10 +23,28 @@ public class CartController {
     private CartService cartService;
 
     @GetMapping("/cart.html")
-    public String cartListPage() {
-        UserInfoTo infoTo = CartInterceptor.THREAD_LOCAL.get();
-
+    public String cartListPage(Model model) throws ExecutionException, InterruptedException {
+        CartVo cart = cartService.getCart();
+        model.addAttribute("cart", cart);
         return "cartList";
+    }
+
+    @GetMapping("/checkCart")
+    public String checkCart(@RequestParam Long skuId, @RequestParam Boolean check) {
+        cartService.checkItem(skuId, check);
+        return "redirect:http://cart.gulimall.com/cart.html";
+    }
+
+    @GetMapping("/removeItem")
+    public String removeItem(@RequestParam Long skuId) {
+        cartService.removeItem(skuId);
+        return "redirect:http://cart.gulimall.com/cart.html";
+    }
+
+    @GetMapping("/changCount")
+    public String changCount(@RequestParam Long skuId, @RequestParam Integer num) {
+        cartService.changCount(skuId, num);
+        return "redirect:http://cart.gulimall.com/cart.html";
     }
 
     @GetMapping("/addToCart")
@@ -36,7 +53,7 @@ public class CartController {
             @RequestParam Integer num,
             RedirectAttributes attributes
     ) throws ExecutionException, InterruptedException {
-        cartService.getCartItemBySkuId(skuId, num);
+        cartService.addSkuToCart(skuId, num);
 
         //添加重定向参数，给成功请求发送消息，避免页面重复刷新造成多次添加购物车
         attributes.addAttribute("skuId", skuId);

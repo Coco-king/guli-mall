@@ -14,6 +14,23 @@ spring:
         server-addr: localhost:8848
         group: dev
         namespace: 999f941b-0bbf-4574-b1f9-e24ff6e341ab
+  rabbitmq:
+    host: 192.168.66.230
+    port: 5672
+    virtual-host: /
+    username: guest
+    password: guest
+    # 开启发送端确认
+    publisher-confirm-type: correlated
+    # 开启发送端消息抵达队列回调
+    publisher-returns: true
+    # 只要抵达队列，以异步方式发送优先回调我们的returnConfirm
+    template:
+      mandatory: true
+    listener:
+      simple:
+        # 手动ack，拿到消息后如果没有ack，那么消息就不会被移除，如果消费者宕机，重新变为ready状态
+        acknowledge-mode: manual
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
   global-config:

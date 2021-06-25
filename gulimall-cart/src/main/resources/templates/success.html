@@ -27,8 +27,8 @@
         </ul>
 
         <ul class="hd_wrap_right">
-          <li style="border: 0;width: 120px;">
-            <a href="http://auth.gulimall.com/login.html" th:if="${session.loginUser==null}">你好，请登录</a>
+          <li style="border: 0;width: 150px;">
+            <a href="http://auth.gulimall.com/login.html" style="width: 100px" th:if="${session.loginUser==null}">你好，请登录</a>
             <a href="JavaScript:void(0)" th:if="${session.loginUser!=null}">你好，[[${session.loginUser.nickname}]]</a>
           </li>
           <li th:if="${session.loginUser==null}">
@@ -65,7 +65,7 @@
       <div class="success-wrap">
         <div class="w" id="result">
           <div class="m succeed-box">
-            <div class="mc success-cont">
+            <div th:if="${item != null}" class="mc success-cont">
               <div class="success-lcol">
                 <div class="success-top"><b class="succ-icon"></b>
                   <h3 class="ftx-02">商品已成功加入购物车</h3></div>
@@ -95,6 +95,9 @@
                   <a class="btn-addtocart" href="http://cart.gulimall.com/cart.html" id="GotoShoppingCart"><b></b>去购物车结算</a>
                 </div>
               </div>
+            </div>
+            <div th:if="${item == null}" class="mc success-cont">
+              <h1>购物车中无此商品</h1> <a href="http://www.gulimall.com">去选购</a>
             </div>
           </div>
         </div>
